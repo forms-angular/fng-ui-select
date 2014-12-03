@@ -15,13 +15,19 @@ build tools).
 
 In your Mongoose schemas you can set up fields like this:
 
-    colour: {type: String, enum: ['Blue', 'Brown', 'Green', 'Hazel'], form: {directive: 'fng-ui-select', theme: 'bootstrap'}}
+    colour: {type: String, enum: ['Blue', 'Brown', 'Green', 'Hazel'], form: {directive: 'fng-ui-select'}}
+    lookup: {type: Schema.Types.ObjectId, ref: 'anotherModel', form: {directive: 'fng-ui-select'}},
 
-theme defaults to select2.  Other options are bootstrap and selectize.  Bootstrap required Bootstrap 3 and will fall
-back to select2.
+Options can be added to a fngUiSelect object with the form object as follows:
+
+* _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
+back to _select2_.
 
 Road map
 
-* Introduce fng-select2 capabilities for lookup and querying the server
+* Introduce fng-select2 capabilities
+  - lookup - done
+  - querying the server
 * Multi select
+* (possibly) support arrays using single selects, as is the case with select and fng-select2
 
