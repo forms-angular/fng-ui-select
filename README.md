@@ -31,3 +31,14 @@ Road map
 * Multi select
 * (possibly) support arrays using single selects, as is the case with select and fng-select2
 
+tests:
+  single enum
+  single lookup from query list
+  single lookup from ajax
+
+  single control multi enum
+  single control multi lookup from query list
+
+  multi control enum
+  multi control lookup from query list
+  multi control lookup from ajax
