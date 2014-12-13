@@ -112,28 +112,22 @@
         // First of all add a hidden input field which we will use to set the width of the select
         var input;
 
+        // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
+        var theme = processedAttr.directiveOptions.theme || 'select2';
+        if (processedAttr.info.theme === 'bootstrap' && cssFrameworkService.framework !== 'bs3') {
+          theme = 'select2';
+        }
+
         if (multi && (processedAttr.directiveOptions.fngajax === 'true' || processedAttr.directiveOptions.forcemultiple === 'true')) {
-          var needsX = false;
-          //if (processedAttr.directiveOptions.forcemultiple) {
-            // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
-            // adding an attribute to the schema.
-            needsX = true;
-            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
-          //}
-          needsX = true;
+          // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
+          // adding an attribute to the schema.
+          pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
 
-          elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, true, needsX, function (buildingBlocks) {
+          elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, true, true, function (buildingBlocks) {
             input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
-
-            // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
-            var theme = processedAttr.directiveOptions.theme || 'select2';
-            if (processedAttr.info.theme === 'bootstrap' && cssFrameworkService.framework !== 'bs3') {
-              theme = 'select2';
-            }
 
             // set up the ui-select directives
             var select = '<ui-select ' + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-
             if (processedAttr.directiveOptions.fngajax === 'true') {
               // Set up lookup function
               scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
@@ -165,12 +159,6 @@
         } else {
           elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, null, null, function (buildingBlocks) {
             input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
-
-            // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
-            var theme = processedAttr.directiveOptions.theme || 'select2';
-            if (processedAttr.info.theme === 'bootstrap' && cssFrameworkService.framework !== 'bs3') {
-              theme = 'select2';
-            }
 
             var multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
 
