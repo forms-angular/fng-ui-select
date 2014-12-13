@@ -112,9 +112,9 @@
         // First of all add a hidden input field which we will use to set the width of the select
         var input;
 
-        if (multi && (processedAttr.directiveOptions.fngajax === 'true' || processedAttr.directiveOptions.forcemulti === 'true')) {
+        if (multi && (processedAttr.directiveOptions.fngajax === 'true' || processedAttr.directiveOptions.forcemultiple === 'true')) {
           var needsX = false;
-          //if (processedAttr.directiveOptions.forcemulti) {
+          //if (processedAttr.directiveOptions.forcemultiple) {
             // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
             // adding an attribute to the schema.
             needsX = true;

@@ -23,22 +23,15 @@ Options can be added to a fngUiSelect object with the form object as follows:
 * _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
 back to _select2_.
 
-Road map
+## Tests
 
-* Introduce fng-select2 capabilities
-  - lookup - done
-  - querying the server
-* Multi select
-* (possibly) support arrays using single selects, as is the case with select and fng-select2
+e2e tests require the forms-angular website (https://github.com/forms-angular/website)
+
+## Road map
 
 tests:
-  single enum
-  single lookup from query list
-  single lookup from ajax
+  multiple control enum
+  multiple control lookup from query list
+  multiple control lookup from ajax
 
-  single control multi enum
-  single control multi lookup from query list
-
-  multi control enum
-  multi control lookup from query list
-  multi control lookup from ajax
+single control multi lookup from query list and test - or inhibit it
