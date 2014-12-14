@@ -77,7 +77,6 @@
           $scope[id + '_options'] = [];
         } else {
           return $http.get('/api/search/' + elem.ref + '?q=' + searchString).then(function(response) {
-            var array = [];
             $scope[id + '_options'] = response.data.results;
           });
         }
@@ -101,16 +100,13 @@
       controller: 'FngUISelectCtrl',
       link: function (scope, element, attr) {
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
-        console.log(processedAttr);
         var elemScope = {selectId: processedAttr.info.id};
         var multi = (processedAttr.info.array === 'true');
         var elementHtml;
+        var input='';
 
         scope.uiSelect.push(elemScope);
         scope.conversions[processedAttr.info.name] = processedAttr.directiveOptions;
-
-        // First of all add a hidden input field which we will use to set the width of the select
-        var input;
 
         // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
         var theme = processedAttr.directiveOptions.theme || 'select2';
@@ -130,6 +126,7 @@
         }
 
         elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
+          // First of all add a hidden input field which we will use to set the width of the select
           input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
 
           // set up the ui-select directives
@@ -164,7 +161,6 @@
           }
           select += '</ui-select-choices>';
           select += '</ui-select>';
-          console.log(select);
           return select;
         });
         element.replaceWith($compile(input + elementHtml)(scope));
