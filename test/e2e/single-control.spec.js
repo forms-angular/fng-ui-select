@@ -11,14 +11,14 @@ describe('Single control', function () {
   it('should handle simple enum', function () {
     browser.get('/#/b_enhanced_schema/new');
     var match = $('a.select2-choice.ui-select-match');
-    expect(match.getText()).toEqual('Select an option...');
+    expect(match.getText()).toEqual('Choose hair colour...');
     var field = element(by.model('record.surname'));
     field.clear();
     field.sendKeys('Smith');
     element(by.model('record.accepted')).click();
     var saveButton = $('#saveButton');
     saveButton.click();
-    expect(match.getText()).toEqual('Select an option...');
+    expect(match.getText()).toEqual('Choose hair colour...');
 
     $('#cg_f_hairColour .select2-arrow').click();
     element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(3).click();

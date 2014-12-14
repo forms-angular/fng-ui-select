@@ -22,16 +22,11 @@ Options can be added to a fngUiSelect object with the form object as follows:
 
 * _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
 back to _select2_.
+* _fngAjax_ when set to true, creates a control that queries the back end after each keystroke for matches
+* _forceMultiple_ when set to true on an array schema element will create multiple controls, rather than a single control
+accepting multiple selections.
 
 ## Tests
 
 e2e tests require the forms-angular website (https://github.com/forms-angular/website)
 
-## Road map
-
-tests:
-  multiple control enum
-  multiple control lookup from query list
-  multiple control lookup from ajax
-
-single control multi lookup from query list and test - or inhibit it

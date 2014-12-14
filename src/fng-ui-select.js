@@ -118,81 +118,55 @@
           theme = 'select2';
         }
 
+        var multiControl = false;
+        var multiStr = '';
         if (multi && (processedAttr.directiveOptions.fngajax === 'true' || processedAttr.directiveOptions.forcemultiple === 'true')) {
           // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
           // adding an attribute to the schema.
           pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
-
-          elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, true, true, function (buildingBlocks) {
-            input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
-
-            // set up the ui-select directives
-            var select = '<ui-select ' + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-            if (processedAttr.directiveOptions.fngajax === 'true') {
-              // Set up lookup function
-              scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
-              // Use the forms-angular API to query the referenced collection
-              elemScope.ref = processedAttr.info.ref;
-              scope[processedAttr.info.id + '_options'] = [];
-              select += '<ui-select-match placeholder="Select an option...">';
-              select += '{{$select.selected.text}}';
-              select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in ' + processedAttr.info.id + '_options track by $index" ';
-              select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
-              select += 'refresh-delay="0"> ';
-              select += '<div ng-bind-html="option.text"></div>';
-            } else if (processedAttr.info.options) {
-              // Simple case - enumerated options on the form scope
-
-              select += '<ui-select-match placeholder="Select an option...">';
-              select += '{{$select.selected}}';
-              select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in ' + processedAttr.info.options + ' | filter:$select.search">';
-              select += '<div ng-bind-html="option"></div>';
-            }
-            select += '</ui-select-choices>';
-            select += '</ui-select>';
-            console.log(select);
-            return select;
-
-          });
+          multiControl = true;
         } else {
-          elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, null, null, function (buildingBlocks) {
-            input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
-
-            var multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
-
-            // set up the ui-select directives
-            var select = '<ui-select ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-
-            if (processedAttr.directiveOptions.fngajax === 'true') {
-              // Set up lookup function
-              scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
-              // Use the forms-angular API to query the referenced collection
-              elemScope.ref = processedAttr.info.ref;
-              scope[processedAttr.info.id + '_options'] = [];
-              select += '<ui-select-match placeholder="Select an option...">';
-              select += '{{' + attr.model + '.' + processedAttr.info.name + '.text}}';
-              select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in ' + processedAttr.info.id + '_options track by $index" ';
-              select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
-              select += 'refresh-delay="0"> ';
-              select += '<div ng-bind-html="option.text"></div>';
-            } else if (processedAttr.info.options) {
-              // Simple case - enumerated options on the form scope
-
-              select += '<ui-select-match placeholder="Select an option...">';
-              select += multi ? '{{$item}}' : '{{$select.selected}}';
-              select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in ' + processedAttr.info.options + ' | filter:$select.search">';
-              select += '<div ng-bind-html="option"></div>';
-            }
-            select += '</ui-select-choices>';
-            select += '</ui-select>';
-            console.log(select);
-            return select;
-          });
+          multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
         }
+
+        elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
+          input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
+
+          // set up the ui-select directives
+          var select = '<ui-select ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
+          select += '<ui-select-match placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
+          if (processedAttr.directiveOptions.fngajax === 'true') {
+            // Set up lookup function
+            scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
+            // Use the forms-angular API to query the referenced collection
+            elemScope.ref = processedAttr.info.ref;
+            scope[processedAttr.info.id + '_options'] = [];
+            if (multiControl) {
+              select += '{{$select.selected.text}}';
+            } else {
+              select += '{{' + attr.model + '.' + processedAttr.info.name + '.text}}';
+            }
+            select += '</ui-select-match>';
+            select += '<ui-select-choices repeat="option in ' + processedAttr.info.id + '_options track by $index" ';
+            select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
+            select += 'refresh-delay="0"> ';
+            select += '<div ng-bind-html="option.text"></div>';
+          } else if (processedAttr.info.options) {
+            // Simple case - enumerated options on the form scope
+            if (multiControl) {
+              select += '{{$select.selected}}';
+            } else {
+              select += multi ? '{{$item}}' : '{{$select.selected}}';
+            }
+            select += '</ui-select-match>';
+            select += '<ui-select-choices repeat="option in ' + processedAttr.info.options + ' | filter:$select.search">';
+            select += '<div ng-bind-html="option"></div>';
+          }
+          select += '</ui-select-choices>';
+          select += '</ui-select>';
+          console.log(select);
+          return select;
+        });
         element.replaceWith($compile(input + elementHtml)(scope));
       }
     }
