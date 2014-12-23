@@ -131,7 +131,7 @@
 
           // set up the ui-select directives
           var select = '<ui-select ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-          select += '<ui-select-match placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
+          select += '<ui-select-match allow-clear=true placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
           if (processedAttr.directiveOptions.fngajax === 'true') {
             // Set up lookup function
             scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
