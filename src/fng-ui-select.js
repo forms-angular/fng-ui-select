@@ -8,7 +8,7 @@
     return {
       windowChanged: function(w,h) {
         var result = false;
-        if (w != lastW || h !== lastH) {
+        if (w !== lastW || h !== lastH) {
           lastW = w;
           lastH = h;
           result = true;
@@ -31,12 +31,12 @@
             cb(formSchema, results);
             setTimeout(function() {
               $rootScope.$digest();
-            })
-          })
+            });
+          });
         } else {
           SubmissionsService.getListAttributes(formSchema.ref, value).then(function(response) {
             cb(formSchema, {id: value, text: response.data.list});
-          })
+          });
         }
       }
     };
@@ -105,6 +105,12 @@
         var elementHtml;
         var input='';
 
+        scope.onSelectChange = function(item /*, model */){
+            console.log(arguments);
+          if (typeof item === 'undefined') {
+              processedAttr.info.id = undefined;
+          }
+        };
         scope.uiSelect.push(elemScope);
         scope.conversions[processedAttr.info.name] = processedAttr.directiveOptions;
 
@@ -130,8 +136,9 @@
           input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
 
           // set up the ui-select directives
-          var select = '<ui-select ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
+          var select = '<ui-select on-select="onSelectChange($item, $model)" ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
           select += '<ui-select-match allow-clear=true placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
+            
           if (processedAttr.directiveOptions.fngajax === 'true') {
             // Set up lookup function
             scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
@@ -168,4 +175,3 @@
     }
   }]);
 })();
-
