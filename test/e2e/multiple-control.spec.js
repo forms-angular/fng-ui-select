@@ -2,7 +2,6 @@
 
 describe('Multiple controls array', function () {
 
-  var browser = protractor.getInstance();
   var width = 1024;
   var height = 768;
   browser.driver.manage().window().setSize(width, height);
