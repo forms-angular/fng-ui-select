@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "author": "Mark Chapman <support@forms-angular.org>",
   "description": "ui-select plugin for forms-angular",
-  "main": "src/fng-ui-select.js",
+  "main": [
+    "src/fng-ui-select.js",
+    "styles/fng-ui-select.css"
+  ],
   "keywords": [
     "forms-angular"
   ],

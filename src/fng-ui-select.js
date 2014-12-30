@@ -100,17 +100,12 @@
       controller: 'FngUISelectCtrl',
       link: function (scope, element, attr) {
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
+        console.log(processedAttr);
         var elemScope = {selectId: processedAttr.info.id};
         var multi = (processedAttr.info.array === 'true');
         var elementHtml;
         var input='';
 
-        scope.onSelectChange = function(item /*, model */){
-            console.log(arguments);
-          if (typeof item === 'undefined') {
-              processedAttr.info.id = undefined;
-          }
-        };
         scope.uiSelect.push(elemScope);
         scope.conversions[processedAttr.info.name] = processedAttr.directiveOptions;
 
@@ -131,13 +126,23 @@
           multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
         }
 
+        var requiredStr = '';
+        var allowClearStr = '';
+
+        if (processedAttr.info.required) {
+          requiredStr = ' ng-required="true"';
+        } else {
+          allowClearStr = ' allow-clear=true';
+        }
+
         elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
           // First of all add a hidden input field which we will use to set the width of the select
           input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
 
           // set up the ui-select directives
-          var select = '<ui-select on-select="onSelectChange($item, $model)" ' + multiStr + buildingBlocks.common + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-          select += '<ui-select-match allow-clear=true placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
+          var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
+          console.log(select);
+          select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
             
           if (processedAttr.directiveOptions.fngajax === 'true') {
             // Set up lookup function

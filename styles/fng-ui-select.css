@@ -1,0 +1,11 @@
+.ng-invalid-required > a.select2-choice {
+    background-color: rgba(255, 0, 0, 0.10);
+}
+
+.ng-invalid-required > div.selectize-input {
+    background-color: rgba(255, 0, 0, 0.10);
+}
+
+.ui-select-bootstrap.ng-invalid-required > button.btn.ui-select-match {
+    background-color: rgba(255, 0, 0, 0.10);
+}
