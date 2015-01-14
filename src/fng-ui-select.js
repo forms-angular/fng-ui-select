@@ -100,7 +100,6 @@
       controller: 'FngUISelectCtrl',
       link: function (scope, element, attr) {
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
-        console.log(processedAttr);
         var elemScope = {selectId: processedAttr.info.id};
         var multi = (processedAttr.info.array === 'true');
         var elementHtml;
