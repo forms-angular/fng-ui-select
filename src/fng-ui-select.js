@@ -140,7 +140,6 @@
 
           // set up the ui-select directives
           var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-          console.log(select);
           select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
             
           if (processedAttr.directiveOptions.fngajax === 'true') {
