@@ -127,17 +127,21 @@
 
         var requiredStr = '';
         var allowClearStr = '';
-
         if (processedAttr.info.required) {
           requiredStr = ' ng-required="true"';
         } else {
-          allowClearStr = ' allow-clear=true';
+          allowClearStr = ' allow-clear';
         }
 
+        // First of all add a hidden input field which we will use to set the width of the select
+        var hiddenInputInfo = {
+          id: processedAttr.info.id + '_width-helper',
+          label: ''
+        };
+        input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
+          return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -1200px;">';
+        });
         elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
-          // First of all add a hidden input field which we will use to set the width of the select
-          input = '<input id="' + processedAttr.info.id + '_width-helper" class="' + buildingBlocks.sizeClassBS2 + ' ' + buildingBlocks.sizeClassBS3 + '" type="text" disabled="" style="position: absolute; top: -200px;">';
-
           // set up the ui-select directives
           var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
           select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';

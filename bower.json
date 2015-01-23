@@ -12,8 +12,9 @@
   ],
   "license": "MIT",
   "homepage": "www.forms-angular.org",
+  "comments": "Bootstrap theme styling is all cocked up after 0.9.2",
   "dependencies": {
-    "angular-ui-select": "*"
+    "angular-ui-select": "0.9.2"
   },
   "ignore": [
     "**/.*",
