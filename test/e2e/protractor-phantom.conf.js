@@ -3,9 +3,8 @@ exports.config = {
     './**/*.spec.js'
   ],
   capabilities: {
-    browserName: 'phantomjs',
-    version: '',
-    platform: 'ANY'
+    browserName: 'phantomjs'
   },
-  baseUrl: 'http://localhost:9001'
+  directConnect: true,
+  baseUrl: 'http://localhost:9000'
 };

@@ -4,8 +4,7 @@ exports.config = {
   ],
   capabilities: {
     browserName: 'chrome',
-    version: '',
-    platform: 'ANY'
   },
-  baseUrl: 'http://localhost:9001'
+  directConnect: true,
+  baseUrl: 'http://localhost:9000'
 };

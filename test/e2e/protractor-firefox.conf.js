@@ -3,9 +3,8 @@ exports.config = {
     './**/*.spec.js'
   ],
   capabilities: {
-    browserName: 'firefox',
-    version: '',
-    platform: 'ANY'
+    browserName: 'firefox'
   },
-  baseUrl: 'http://localhost:9001'
+  directConnect: true,
+  baseUrl: 'http://localhost:9000'
 };
