@@ -136,6 +136,7 @@
         // First of all add a hidden input field which we will use to set the width of the select
         var hiddenInputInfo = {
           id: processedAttr.info.id + '_width-helper',
+          name: processedAttr.info.name + '_width-helper',
           label: ''
         };
         input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
