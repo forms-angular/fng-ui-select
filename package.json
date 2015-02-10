@@ -1,0 +1,20 @@
+{
+  "name": "fng-ui-select",
+  "author": "Mark Chapman <support@forms-angular.org>",
+  "version": "0.0.1",
+  "description": "angular-ui-select plugin for forms-angular",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forms-angular/fng-ui-select"
+  },
+  "devDependencies": {
+    "protractor-screenshot-reporter": "0.0.4"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test node ../website/server.js && protractor test/e2e/protractor-firefox.conf.js",
+    "clear": "kill `ps -ef | grep '[0-9] node ../website/server.js' | egrep -o ' ([0-9]+) ' | head -1 | sed -e 's/ //'` -9"
+  }
+}
