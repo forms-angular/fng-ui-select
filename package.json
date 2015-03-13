@@ -1,7 +1,7 @@
 {
   "name": "fng-ui-select",
   "author": "Mark Chapman <support@forms-angular.org>",
-  "version": "0.0.1",
+  "version": "0.4.1",
   "description": "angular-ui-select plugin for forms-angular",
   "repository": {
     "type": "git",
