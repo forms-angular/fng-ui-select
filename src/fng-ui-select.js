@@ -43,7 +43,7 @@
   }]);
 
 
-  uiSelectModule.controller('FngUISelectCtrl',function($scope, $window, $timeout, $http, uiSelectHelper) {
+  uiSelectModule.controller('FngUISelectCtrl',['$scope', '$window', '$timeout', '$http', 'uiSelectHelper', function($scope, $window, $timeout, $http, uiSelectHelper) {
 
     $scope.uiSelect = $scope.uiSelect || [];
 
@@ -91,7 +91,7 @@
     });
 
     $timeout($scope.windowResizeUiSelect);
-  });
+  }]);
 
   uiSelectModule.directive('fngUiSelect', ['$compile','$window','pluginHelper', 'cssFrameworkService', 'formMarkupHelper', 'uiSelectHelper',
     function ($compile, $window, pluginHelper, cssFrameworkService, formMarkupHelper, uiSelectHelper) {
