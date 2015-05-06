@@ -178,7 +178,8 @@
           select += '</ui-select>';
           return select;
         });
-        element.replaceWith($compile(input + elementHtml)(scope));
+        scope.content = input + elementHtml;
+        element.append($compile(input + elementHtml)(scope));
       }
     }
   }]);
