@@ -18,7 +18,7 @@ In your Mongoose schemas you can set up fields like this:
     colour: {type: String, enum: ['Blue', 'Brown', 'Green', 'Hazel'], form: {directive: 'fng-ui-select'}}
     lookup: {type: Schema.Types.ObjectId, ref: 'anotherModel', form: {directive: 'fng-ui-select'}},
 
-Options can be added to a fngUiSelect object with the form object as follows:
+Options can be added to a fngUiSelect object within the form object as follows:
 
 * _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
 back to _select2_.
