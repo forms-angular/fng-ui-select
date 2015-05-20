@@ -61,7 +61,7 @@
               if (select.offsetLeft + w > $window.innerWidth) {
                 w = $window.innerWidth - select.offsetLeft - 20;
               }
-              angular.element('#' + selectId).css('width', w);
+              angular.element(document.getElementById(selectId)).css('width', w);
             } else {
               console.log('No helper element found for ' + selectId);
             }
