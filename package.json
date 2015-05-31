@@ -13,6 +13,7 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "license":"MIT",
   "scripts": {
     "test": "NODE_ENV=test node ../website/server.js && protractor test/e2e/protractor-firefox.conf.js",
     "clear": "kill `ps -ef | grep '[0-9] node ../website/server.js' | egrep -o ' ([0-9]+) ' | head -1 | sed -e 's/ //'` -9"
