@@ -101,7 +101,7 @@
       link: function (scope, element, attr) {
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
         var elemScope = {selectId: processedAttr.info.id};
-        var multi = (processedAttr.info.array === 'true');
+        var multi = processedAttr.info.array;
         var elementHtml;
         var input='';
 
@@ -116,7 +116,7 @@
 
         var multiControl = false;
         var multiStr = '';
-        if (multi && (processedAttr.directiveOptions.fngajax === 'true' || processedAttr.directiveOptions.forcemultiple === 'true')) {
+        if (multi && (processedAttr.directiveOptions.fngajax || processedAttr.directiveOptions.forcemultiple)) {
           // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
           // adding an attribute to the schema.
           pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
@@ -142,12 +142,26 @@
         input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
           return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
         });
+
+        function optionsFromArray(multiControl, multi, array) {
+          var select = ''
+          if (multiControl) {
+            select += '{{$select.selected}}';
+          } else {
+            select += multi ? '{{$item}}' : '{{$select.selected}}';
+          }
+          select += '</ui-select-match>';
+          select += '<ui-select-choices repeat="option in ' + array + ' | filter:$select.search">';
+          select += '<div ng-bind-html="option"></div>';
+          return select;
+        }
+
         elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
           // set up the ui-select directives
           var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
           select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
             
-          if (processedAttr.directiveOptions.fngajax === 'true') {
+          if (processedAttr.directiveOptions.fngajax) {
             // Set up lookup function
             scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
             // Use the forms-angular API to query the referenced collection
@@ -163,16 +177,13 @@
             select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
             select += 'refresh-delay="0"> ';
             select += '<div ng-bind-html="option.text"></div>';
+          } else if (processedAttr.directiveOptions.deriveoptions) {
+            select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions]());
           } else if (processedAttr.info.options) {
             // Simple case - enumerated options on the form scope
-            if (multiControl) {
-              select += '{{$select.selected}}';
-            } else {
-              select += multi ? '{{$item}}' : '{{$select.selected}}';
-            }
-            select += '</ui-select-match>';
-            select += '<ui-select-choices repeat="option in ' + processedAttr.info.options + ' | filter:$select.search">';
-            select += '<div ng-bind-html="option"></div>';
+            select += optionsFromArray(multiControl, multi, processedAttr.info.options);
+          } else {
+            throw new Error('fng-ui-select has no means of populating select');
           }
           select += '</ui-select-choices>';
           select += '</ui-select>';

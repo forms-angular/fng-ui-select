@@ -24,7 +24,8 @@ Options can be added to a fngUiSelect object within the form object as follows:
 back to _select2_.
 * _fngAjax_ when set to true, creates a control that queries the back end after each keystroke for matches
 * _forceMultiple_ when set to true on an array schema element will create multiple controls, rather than a single control
-accepting multiple selections.
+accepting multiple selections
+* _deriveOptions_ a name of a function on the form scope that returns a property name on the scope that contains the options 
 
 ## Tests
 
