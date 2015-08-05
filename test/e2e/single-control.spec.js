@@ -40,10 +40,10 @@ describe('Single control', function () {
 
     $('#cg_f_singleCached .select2-arrow').click();
     element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(1).click();
-    expect(match.getText()).toEqual('Jones Alan true');
+    expect(match.getText()).toEqual('Jones Alan true 93');
 
     saveButton.click();
-    expect(match.getText()).toEqual('Jones Alan true');
+    expect(match.getText()).toEqual('Jones Alan true 93');
   });
 
   it('should handle Ajax lookup', function () {
