@@ -54,7 +54,7 @@
         for (var i = 0; i < $scope.uiSelect.length; i++) {
           var selectId = $scope.uiSelect[i].selectId;
           var select = document.getElementById(selectId);
-          if (select) {
+          if (select && select.offsetParent) {
             var helper = document.getElementById(selectId + '_width-helper');
             if (helper) {
               var w = helper.offsetWidth;
