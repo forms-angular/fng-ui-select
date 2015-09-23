@@ -69,5 +69,19 @@ describe('Single control', function () {
     expect(match.getText()).toEqual('IsAccepted John true 89');
   });
 
+  it('should handle filtered Ajax lookup', function () {
+    browser.get('/#/test_fng_ui_select/new');
+    var match = $('#cg_f_filteredAjax a.select2-choice.ui-select-match');
+    expect(match.getText()).toEqual('Select an option...');
+    $('#cg_f_filteredAjax .select2-arrow').click();
+    var field = $('#cg_f_filteredAjax input.select2-input');
+    field.clear();
+    field.sendKeys('J');
+
+    expect(element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).count()).toEqual(1);
+    element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(0).click();
+    expect(match.getText()).toEqual('Jones Alan true 93');
+  });
+
 });
 

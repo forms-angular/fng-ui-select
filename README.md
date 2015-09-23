@@ -22,7 +22,24 @@ Options can be added to a fngUiSelect object within the form object as follows:
 
 * _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
 back to _select2_.
-* _fngAjax_ when set to true, creates a control that queries the back end after each keystroke for matches
+* _fngAjax_  creates a control that queries the back end after each keystroke for matches.
+    * Set to true to search the whole of the _ref_ collection (honouring any collection level filters)
+    * Use a mongo search object (converted to JSON and escaped) to apply a filter to the default search.  For example to search 
+only amongst records where the value of *accountSuspended* is false you might do
+
+```
+  customer: {
+    type: Schema.Types.ObjectId
+    ref: 'customer', 
+    form: {
+      directive: 'fng-ui-select',
+      fngUiSelect: {
+        fngAjax: escape(JSON.stringify( {accountSuspended:false} ))
+      } 
+    }
+  }
+```
+
 * _forceMultiple_ when set to true on an array schema element will create multiple controls, rather than a single control
 accepting multiple selections
 * _deriveOptions_ a name of a function on the form scope that returns a property name on the scope that contains the options 

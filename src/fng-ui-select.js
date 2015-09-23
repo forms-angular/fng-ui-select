@@ -76,7 +76,7 @@
         if (searchString.length === 0) {
           $scope[id + '_options'] = [];
         } else {
-          return $http.get('/api/search/' + elem.ref + '?q=' + searchString).then(function(response) {
+          return $http.get('/api/search/' + elem.ref + '?q=' + searchString + (elem.filter?('&f='+elem.filter):'')).then(function(response) {
             $scope[id + '_options'] = response.data.results;
           });
         }
@@ -144,7 +144,7 @@
         });
 
         function optionsFromArray(multiControl, multi, array) {
-          var select = ''
+          var select = '';
           if (multiControl) {
             select += '{{$select.selected}}';
           } else {
@@ -162,6 +162,10 @@
           select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
             
           if (processedAttr.directiveOptions.fngajax) {
+            // Stash any filters
+            if (processedAttr.directiveOptions.fngajax !== true) {
+              elemScope.filter = processedAttr.directiveOptions.fngajax;
+            }
             // Set up lookup function
             scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
             // Use the forms-angular API to query the referenced collection
