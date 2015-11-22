@@ -139,6 +139,9 @@
           name: processedAttr.info.name + '_width-helper',
           label: ''
         };
+        if (processedAttr.info.size) {
+          hiddenInputInfo.size = processedAttr.info.size;
+        }
         input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
           return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
         });
