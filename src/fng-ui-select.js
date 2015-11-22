@@ -160,10 +160,15 @@
         }
 
         elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
+          var defaultPlaceholder = 'Select an option...';
+          if (processedAttr.directiveOptions.fngajax) {
+            defaultPlaceholder = 'Start typing...'
+          }
           // set up the ui-select directives
           var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
-          select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || 'Select an option...') + '">';
-            
+          select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || defaultPlaceholder) + '">';
+
+
           if (processedAttr.directiveOptions.fngajax) {
             // Stash any filters
             if (processedAttr.directiveOptions.fngajax !== true) {
