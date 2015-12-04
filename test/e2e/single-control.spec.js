@@ -49,13 +49,13 @@ describe('Single control', function () {
   it('should handle Ajax lookup', function () {
     browser.get('/#/test_fng_ui_select/new');
     var match = $('#cg_f_singleAjax a.select2-choice.ui-select-match');
-    expect(match.getText()).toEqual('Select an option...');
+    expect(match.getText()).toEqual('Start typing...');
     var field = element(by.model('record.surname'));
     field.clear();
     field.sendKeys('Smith');
     var saveButton = $('#saveButton');
     saveButton.click();
-    expect(match.getText()).toEqual('Select an option...');
+    expect(match.getText()).toEqual('Start typing...');
 
     $('#cg_f_singleAjax .select2-arrow').click();
     field = $('#cg_f_singleAjax input.select2-input');
@@ -72,7 +72,7 @@ describe('Single control', function () {
   it('should handle filtered Ajax lookup', function () {
     browser.get('/#/test_fng_ui_select/new');
     var match = $('#cg_f_filteredAjax a.select2-choice.ui-select-match');
-    expect(match.getText()).toEqual('Select an option...');
+    expect(match.getText()).toEqual('Start typing...');
     $('#cg_f_filteredAjax .select2-arrow').click();
     var field = $('#cg_f_filteredAjax input.select2-input');
     field.clear();

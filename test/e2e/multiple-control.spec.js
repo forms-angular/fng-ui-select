@@ -114,8 +114,8 @@ describe('Multiple controls array', function () {
     addToArray('multipleInsideAjax');
 
     var array = by.css('#cg_f_multipleInsideAjax a.select2-choice.ui-select-match');
-    expect(element.all(array).get(0).getText()).toEqual('Select an option...');
-    expect(element.all(array).get(1).getText()).toEqual('Select an option...');
+    expect(element.all(array).get(0).getText()).toEqual('Start typing...');
+    expect(element.all(array).get(1).getText()).toEqual('Start typing...');
 
     // select entry with mouse
     element(by.css('#f_multipleInsideAjax_0 a span.select2-arrow')).click();
@@ -145,8 +145,8 @@ describe('Multiple controls array', function () {
     addToArray('multipleOutsideAjax');
 
     var array = by.css('#cg_f_multipleOutsideAjax a.select2-choice.ui-select-match');
-    expect(element.all(array).get(0).getText()).toEqual('Select an option...');
-    expect(element.all(array).get(1).getText()).toEqual('Select an option...');
+    expect(element.all(array).get(0).getText()).toEqual('Start typing...');
+    expect(element.all(array).get(1).getText()).toEqual('Start typing...');
 
     // select entry with mouse
     element(by.css('#f_multipleOutsideAjax_0 a span.select2-arrow')).click();
