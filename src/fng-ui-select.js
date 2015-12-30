@@ -77,7 +77,11 @@
           $scope[id + '_options'] = [];
         } else {
           return $http.get('/api/search/' + elem.ref + '?q=' + searchString + (elem.filter?('&f='+elem.filter):'')).then(function(response) {
-            $scope[id + '_options'] = response.data.results;
+            if (elem.additional) {
+              $scope[id + '_options'] = response.data.results.map(function(result) {result.text = result.text + (result.additional ? (', ' + result.additional) : ''); return result; });
+            } else {
+              $scope[id + '_options'] = response.data.results;
+            }
           });
         }
       } else {
@@ -100,7 +104,7 @@
       controller: 'FngUISelectCtrl',
       link: function (scope, element, attr) {
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
-        var elemScope = {selectId: processedAttr.info.id};
+        var elemScope = angular.extend({selectId: processedAttr.info.id},processedAttr.directiveOptions);
         var multi = processedAttr.info.array;
         var elementHtml;
         var input='';
