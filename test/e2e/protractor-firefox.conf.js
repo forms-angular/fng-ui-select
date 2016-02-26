@@ -10,8 +10,9 @@ exports.config = {
   capabilities: {
     browserName: 'firefox'
   },
-  //directConnect: true,  broken with firefox 38 - see https://github.com/angular/protractor/issues/2134
+  directConnect: true,
   baseUrl: 'http://localhost:9000',
+  framework: 'jasmine',
 
   onPrepare: function() {
 
@@ -34,3 +35,4 @@ exports.config = {
   }
 
 };
+

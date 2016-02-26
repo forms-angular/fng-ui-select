@@ -190,7 +190,7 @@
             }
             select += '</ui-select-match>';
             // TODO Remove the "| filter: $select.search" below when https://github.com/angular-ui/ui-select/issues/1263, https://github.com/angular-ui/ui-select/issues/1233 etc fixed
-            select += '<ui-select-choices repeat="option in ' + processedAttr.info.id + '_options | filter: $select.search track by $index" ';
+            select += '<ui-select-choices repeat="option in (' + processedAttr.info.id + '_options) track by $index" ';
             select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
             select += 'refresh-delay="0"> ';
             select += '<div ng-bind-html="option.text"></div>';
