@@ -3,3 +3,5 @@
 node_modules
 test/screen_tests/screenshots/*.json
 client
+bower_components
+bower_components
