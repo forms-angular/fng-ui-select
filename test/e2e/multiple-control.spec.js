@@ -48,6 +48,7 @@ describe('Multiple controls array', function () {
 
     var saveButton = $('#saveButton');
     saveButton.click();
+    browser.sleep(400);
     browser.switchTo().alert().then(function (alert) {alert.accept() });    // THis model has an onSave event
     expect(browser.getCurrentUrl()).toMatch('/d_array_example/[0-9a-f]{24}/edit');
 
