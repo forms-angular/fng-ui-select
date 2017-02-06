@@ -40,10 +40,10 @@ describe('Single control', function () {
 
     $('#cg_f_singleCached .select2-arrow').click();
     element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(1).click();
-    expect(match.getText()).toEqual('Jones Alan true 93');
+    expect(match.getText()).toMatch('Jones Alan true 93');
 
     saveButton.click();
-    expect(match.getText()).toEqual('Jones Alan true 93');
+    expect(match.getText()).toMatch('Jones Alan true 93');
   });
 
   it('should handle Ajax lookup', function () {
@@ -63,10 +63,10 @@ describe('Single control', function () {
     field.sendKeys('Is');
 
     element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(0).click();
-    expect(match.getText()).toEqual('IsAccepted John true 89');
+    expect(match.getText()).toMatch('IsAccepted John true 89');
 
     saveButton.click();
-    expect(match.getText()).toEqual('IsAccepted John true 89');
+    expect(match.getText()).toMatch('IsAccepted John true 89');
   });
 
   it('should handle filtered Ajax lookup', function () {
@@ -80,7 +80,7 @@ describe('Single control', function () {
 
     expect(element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).count()).toEqual(1);
     element.all(by.css('.select2-result-label.ui-select-choices-row-inner')).get(0).click();
-    expect(match.getText()).toEqual('Jones Alan true 93');
+    expect(match.getText()).toMatch('Jones Alan true 93');
   });
 
 });
