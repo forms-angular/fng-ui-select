@@ -103,6 +103,20 @@
       restrict: 'E',
       controller: 'FngUISelectCtrl',
       link: function (scope, element, attr) {
+
+        function addToConversions(path, options) {
+            if (Object.keys(options).length > 0) {
+                var keys = path.split('.');
+                var target = scope.conversions;
+                for (var i = 0; i < keys.length; i++) {
+                    var thisKey = keys[i];
+                    target[thisKey] = target[thisKey] || {};
+                    target = target[thisKey];
+                }
+                angular.extend(target, options);
+            }
+        }
+
         var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
         var elemScope = angular.extend({selectId: processedAttr.info.id},processedAttr.directiveOptions);
         var multi = processedAttr.info.array;
@@ -110,7 +124,7 @@
         var input='';
 
         scope.uiSelect.push(elemScope);
-        scope.conversions[processedAttr.info.name] = processedAttr.directiveOptions;
+        addToConversions(processedAttr.info.name, processedAttr.directiveOptions);
 
         // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
         var theme = processedAttr.directiveOptions.theme || 'select2';
@@ -179,14 +193,16 @@
               elemScope.filter = processedAttr.directiveOptions.fngajax;
             }
             // Set up lookup function
-            scope.conversions[processedAttr.info.name].fngajax = uiSelectHelper.lookupFunc;
+            addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
             // Use the forms-angular API to query the referenced collection
             elemScope.ref = processedAttr.info.ref;
             scope[processedAttr.info.id + '_options'] = [];
             if (multiControl) {
               select += '{{$select.selected.text}}';
+            } else if (processedAttr.options.subschema) {
+              select += '{{' + attr.model + '.' + processedAttr.info.name.replace(processedAttr.options.subschemaroot,processedAttr.options.subschemaroot + '[$index]')  + '.text}}';
             } else {
-              select += '{{' + attr.model + '.' + processedAttr.info.name + '.text}}';
+              select += '{{' + buildingBlocks.modelString + '.text}}';
             }
             select += '</ui-select-match>';
             // TODO Remove the "| filter: $select.search" below when https://github.com/angular-ui/ui-select/issues/1263, https://github.com/angular-ui/ui-select/issues/1233 etc fixed

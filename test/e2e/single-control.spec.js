@@ -84,4 +84,3 @@ describe('Single control', function () {
   });
 
 });
-
