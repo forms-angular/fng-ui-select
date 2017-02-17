@@ -1,6 +1,6 @@
 {
   "name": "fng-ui-select",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "author": "Mark Chapman <support@forms-angular.org>",
   "description": "ui-select plugin for forms-angular",
   "main": [
@@ -13,7 +13,7 @@
   "license": "MIT",
   "homepage": "www.forms-angular.org",
   "dependencies": {
-    "angular-ui-select": "0.19.5"
+    "angular-ui-select": "0.19.6"
   },
   "ignore": [
     "**/.*",
