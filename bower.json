@@ -13,7 +13,8 @@
   "license": "MIT",
   "homepage": "www.forms-angular.org",
   "dependencies": {
-    "angular-ui-select": "0.19.6"
+    "angular-ui-select": "0.19.6",
+    "select2": "3.4.3"
   },
   "ignore": [
     "**/.*",
