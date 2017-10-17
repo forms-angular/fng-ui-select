@@ -47,7 +47,7 @@ default search behaviour](http://forms-angular.org/#/forms#search).
 * _forceMultiple_ when set to true on an array schema element will create multiple controls, rather than a single control
 accepting multiple selections
 * _deriveOptions_ a name of a function on the form scope that returns a property name on the scope that contains the options 
-* _additional_ appends the contents of the _additional_ property (if any) in the result set from the lookup fiunction
+* _additional_ appends the contents of the _additional_ property (if any) in the result set from the lookup function
 * _noconvert_ inhibits the options being passed to forms-angular, so no automatic lookups are performed (sometimes useful when 
 using fng-ui-select in a directive on a forms-angular form. 
 
