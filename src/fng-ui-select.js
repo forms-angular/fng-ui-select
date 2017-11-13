@@ -5,6 +5,7 @@
 
   uiSelectModule.factory('uiSelectHelper', ['$rootScope', '$q', 'SubmissionsService', function ($rootScope, $q, SubmissionsService) {
     var lastW, lastH;
+    var localLookups = {};
     return {
       windowChanged: function(w,h) {
         var result = false;
@@ -15,24 +16,38 @@
         }
         return result;
       },
+      addClientLookup: function(lkpName, lkpData) {
+        localLookups[lkpName] = lkpData;
+      },
       lookupFunc: function(value, formSchema, cb) {
         if (formSchema.array) {
           // TODO extend back end to do multiple lookups in one hit
 
           var promises = [];
           var results = [];
-          angular.forEach(value, function(obj) {
+          angular.forEach(value, function (obj) {
             promises.push(SubmissionsService.getListAttributes(formSchema.ref, obj.x));
           });
-          $q.all(promises).then(function(responses) {
-            angular.forEach(responses, function(response) {
-                results.push({x:{id:value.shift().x, text:response.data.list}});
-              });
+          $q.all(promises).then(function (responses) {
+            angular.forEach(responses, function (response) {
+              results.push({x: {id: value.shift().x, text: response.data.list}});
+            });
             cb(formSchema, results);
-            setTimeout(function() {
+            setTimeout(function () {
               $rootScope.$digest();
             });
           });
+        } else if (formSchema.fngUiSelect.deriveOptions) {
+          var retVal;
+          if (typeof value === 'string') {
+            var obj = localLookups[formSchema.fngUiSelect.deriveOptions].find(function (test) {
+              return test.id === value
+            });
+            retVal = {id: value, text: obj ? obj.text : ''}
+          } else {
+            retVal = value;
+          }
+          cb(formSchema, retVal);
         } else {
           SubmissionsService.getListAttributes(formSchema.ref, value).then(function(response) {
             cb(formSchema, {id: value, text: response.data.list});
@@ -164,16 +179,21 @@
           return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
         });
 
-        function optionsFromArray(multiControl, multi, array) {
+        function optionsFromArray(multiControl, multi, array, arrayGetter) {
+          var isObjects = (typeof scope[array][0] === "object");
+          if (isObjects) {
+            addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
+            uiSelectHelper.addClientLookup(arrayGetter, scope[array]);
+          }
           var select = '';
           if (multiControl) {
-            select += '{{$select.selected}}';
+            select += '{{$select.selected' + (isObjects?'.text':'') +'}}';
           } else {
-            select += multi ? '{{$item}}' : '{{$select.selected}}';
+            select += multi ? '{{$item}}' : ('{{$select.selected' + (isObjects?'.text':'') + '}}');
           }
           select += '</ui-select-match>';
           select += '<ui-select-choices repeat="option in ' + array + ' | filter:$select.search">';
-          select += '<div ng-bind-html="option"></div>';
+          select += '<div ng-bind-html="option' + (isObjects?'.text':'') + '"></div>';
           return select;
         }
 
@@ -210,7 +230,7 @@
             select += 'refresh-delay="0"> ';
             select += '<div ng-bind-html="option.text"></div>';
           } else if (processedAttr.directiveOptions.deriveoptions) {
-            select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions]());
+            select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions](), processedAttr.directiveOptions.deriveoptions);
           } else if (processedAttr.info.options) {
             // Simple case - enumerated options on the form scope
             select += optionsFromArray(multiControl, multi, processedAttr.info.options);
