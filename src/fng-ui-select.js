@@ -180,7 +180,7 @@
         });
 
         function optionsFromArray(multiControl, multi, array, arrayGetter) {
-          var isObjects = (typeof scope[array][0] === "object");
+          var isObjects = (scope[array].isObjects || typeof scope[array][0] === "object");
           if (isObjects) {
             addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
             uiSelectHelper.addClientLookup(arrayGetter, scope[array]);
