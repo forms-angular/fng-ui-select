@@ -227,7 +227,7 @@
             select += '</ui-select-match>';
             select += '<ui-select-choices repeat="option in (' + processedAttr.info.id + '_options) track by $index" ';
             select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
-            select += 'refresh-delay="0"> ';
+            select += 'refresh-delay="100"> ';
             select += '<div ng-bind-html="option.text"></div>';
           } else if (processedAttr.directiveOptions.deriveoptions) {
             select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions](), processedAttr.directiveOptions.deriveoptions);
