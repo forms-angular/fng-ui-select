@@ -22,9 +22,10 @@ Options can be added to a fngUiSelect object within the form object as follows:
 
 * _theme_ defaults to _select2_.  Other options are _bootstrap_ and _selectize_.  Bootstrap required Bootstrap 3 and will fall
 back to _select2_.
-* _fngAjax_  creates a control that queries the back end after each keystroke for matches.
+* _fngAjax_  creates a control that queries the back end after each keystroke (with 100ms of debounce) for matches.
     * Set to true to search the whole of the _ref_ collection (honouring any collection level filters)
-    * Use a mongo search object (converted to JSON and escaped) to apply a filter to the default search.  For example to search 
+    * Assign a string starting with '/' to do your own query on the backend.  The search string will be in _req.query.q_ and the current value of the existing record in _req.query.e_.
+    * Use a mongo search object (converted to JSON and escaped) to apply a filter to the default search over _ref_ collection.  For example to search 
 only amongst records where the value of *accountSuspended* is false you might do
 
 ```
