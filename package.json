@@ -7,13 +7,20 @@
     "type": "git",
     "url": "https://github.com/forms-angular/fng-ui-select"
   },
+  "dependencies": {
+    "ui-select": "0.19.6",
+    "select2": "3.4.3"
+  },
   "devDependencies": {
     "protractor-screenshot-reporter": "0.0.4"
   },
   "engines": {
     "node": ">=0.10.0"
   },
-  "license":"MIT",
+  "keywords": [
+    "forms-angular"
+  ],
+  "license": "MIT",
   "scripts": {
     "test": "NODE_ENV=test node ../website/server.js && protractor test/e2e/protractor-firefox.conf.js",
     "clear": "kill `ps -ef | grep '[0-9] node ../website/server.js' | egrep -o ' ([0-9]+) ' | head -1 | sed -e 's/ //'` -9"

@@ -4,14 +4,17 @@ Plugin for forms-angular that adds ui-select (https://github.com/angular-ui/ui-s
 
 ## Usage
 
-    bower install fng-ui-select
+    npm install fng-ui-select
 
-Add the following lines to your index.html (or equivalent) file.  Wiredep may do this for you if you are using the right
-build tools).
+To get all the dependencies at the top level of your node_modules run
 
-    <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css">
-    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
-    <script src="/bower_components/fng-ui-select/fng-ui-select.js"></script>
+    npm dedupe
+
+Add the following lines to your index.html (or equivalent) file.
+
+    <link rel="stylesheet" href="angular-ui-select/dist/select.css">
+    <script src="angular-ui-select/dist/select.js"></script>
+    <script src="fng-ui-select/fng-ui-select.js"></script>
 
 In your Mongoose schemas you can set up fields like this:
 

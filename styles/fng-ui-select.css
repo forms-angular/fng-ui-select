@@ -11,8 +11,6 @@
     background-color: rgba(255, 0, 0, 0.10);
 }
 
-.hidden-width-helper {
-    /*position: absolute;*/
-    /*top: 20px;*/
-    height: 0;
+.ui-select-container.ui-select-bootstrap {
+    top: -4px;
 }
