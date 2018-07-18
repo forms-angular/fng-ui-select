@@ -106,7 +106,7 @@
               cache: false
             });
           } else {
-            promise = $http.get('/api/search/' + elem.ref + '?q=' + searchString + (elem.filter ? ('&f=' + elem.filter) : ''));
+            promise = $http.get('/api/search/' + elem.ref.collection + '?q=' + searchString + (elem.filter ? ('&f=' + elem.filter) : ''));
           }
           promise.then(function (response) {
             if (elem.additional) {
@@ -236,6 +236,14 @@
               addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
               // Use the forms-angular API to query the referenced collection
               elemScope.ref = processedAttr.info.ref;
+              if (elemScope.ref) {
+                if (elemScope.ref[0] === '{') {
+                  elemScope.ref = JSON.parse(elemScope.ref);
+                } else {
+                  elemScope.ref = {type:'lookup', collection: elemScope.ref};
+                  console.warn('Support for string type "ref" property is deprecated - use ref:' + JSON.stringify(elemScope.ref));
+                }
+              }
               scope[processedAttr.info.id + '_options'] = [];
               if (multiControl) {
                 select += '{{$select.selected.text}}';
