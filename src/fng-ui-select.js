@@ -49,7 +49,7 @@
           }
           cb(formSchema, retVal);
         } else {
-          SubmissionsService.getListAttributes(formSchema.ref.collection, value).then(function (response) {
+          SubmissionsService.getListAttributes({type:'lookup', collection:formSchema.ref.collection}, value).then(function (response) {
             cb(formSchema, {id: value, text: response.data.list});
           });
         }
