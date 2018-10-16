@@ -200,7 +200,7 @@
           });
 
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
-            var isObjects = (scope[array].isObjects || typeof scope[array][0] === "object");
+            var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
             if (isObjects) {
               addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
               uiSelectHelper.addClientLookup(arrayGetter, scope[array]);
@@ -258,7 +258,11 @@
               select += 'refresh-delay="100"> ';
               select += '<div ng-bind-html="option.text"></div>';
             } else if (processedAttr.directiveOptions.deriveoptions) {
-              select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions](), processedAttr.directiveOptions.deriveoptions);
+              if (typeof scope[processedAttr.directiveOptions.deriveoptions] === "function") {
+                select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions](), processedAttr.directiveOptions.deriveoptions);
+              } else {
+                throw new Error("In fng-ui-select " + processedAttr.directiveOptions.deriveoptions + " is not a function on the scope");
+              }
             } else if (processedAttr.info.options) {
               // Simple case - enumerated options on the form scope
               select += optionsFromArray(multiControl, multi, processedAttr.info.options);
