@@ -142,6 +142,9 @@
           function addToConversions(path, options) {
             if (Object.keys(options).length > 0) {
               var keys = path.split('.');
+              if (!scope.conversions) {
+                  scope.conversions = {};
+              }
               var target = scope.conversions;
               for (var i = 0; i < keys.length; i++) {
                 var thisKey = keys[i];
