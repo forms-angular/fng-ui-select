@@ -1,4 +1,7 @@
-.ng-invalid-required > a.select2-choice {
+.ui-select-container.ng-invalid-required,
+.ui-select-container.ng-invalid-required > a.select2-choice,
+.ui-select-container.ng-invalid-required > a.select2-choice > .select2-chosen
+{
     background-color: rgba(255, 0, 0, 0.10);
 }
 
