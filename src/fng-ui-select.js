@@ -109,14 +109,21 @@
             promise = $http.get('/api/search/' + elem.ref.collection + '?q=' + searchString + (elem.filter ? ('&f=' + elem.filter) : ''));
           }
           promise.then(function (response) {
-            if (elem.additional) {
-              $scope[id + '_options'] = response.data.results.map(function (result) {
-                result.text = result.text + (result.additional ? (', ' + result.additional) : '');
-                return result;
-              });
+            if (response.status >= 400) {
+              throw new Error(response.statusMessage)
             } else {
-              $scope[id + '_options'] = response.data.results;
+              if (elem.additional) {
+                $scope[id + '_options'] = response.data.results.map(function (result) {
+                  result.text = result.text + (result.additional ? (', ' + result.additional) : '');
+                  return result;
+                });
+              } else {
+                $scope[id + '_options'] = response.data.results;
+              }
             }
+          })
+          .catch(err => {
+            $scope.showError(err.data);
           });
         }
       } else {
