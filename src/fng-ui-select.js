@@ -41,7 +41,7 @@
           var retVal;
           if (typeof value === 'string') {
             var obj = localLookups[formSchema.fngUiSelect.deriveOptions].find(function (test) {
-              return test.id === value
+              return test.id == value
             });
             retVal = {id: value, text: obj ? obj.text : ''}
           } else {
