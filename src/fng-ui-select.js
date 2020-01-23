@@ -101,7 +101,8 @@
               url: elem.filter,
               params: {
                 q: searchString,
-                e: $scope.record
+                e: $scope.record,
+                i: $scope.$index
               },
               cache: false
             });
@@ -197,17 +198,19 @@
           }
 
           // First of all add a hidden input field which we will use to set the width of the select
-          var hiddenInputInfo = {
-            id: processedAttr.info.id + '_width-helper',
-            name: processedAttr.info.name + '_width-helper',
-            label: ''
-          };
-          if (processedAttr.info.size) {
-            hiddenInputInfo.size = processedAttr.info.size;
+          if (!angular.element('#' + processedAttr.info.id + '_width-helper').length > 0) {
+            var hiddenInputInfo = {
+              id: processedAttr.info.id + '_width-helper',
+              name: processedAttr.info.name + '_width-helper',
+              label: ''
+            };
+            if (processedAttr.info.size) {
+              hiddenInputInfo.size = processedAttr.info.size;
+            }
+            input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
+              return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
+            });
           }
-          input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
-            return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
-          });
 
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
             var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
