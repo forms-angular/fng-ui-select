@@ -4,4 +4,5 @@ node_modules
 test/screen_tests/screenshots/*assasas*.json
 client
 bower_components
-bower_components
+cypress/fixtures
+cypress/integration/examples

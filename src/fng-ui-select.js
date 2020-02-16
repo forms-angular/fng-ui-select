@@ -278,7 +278,6 @@
             select += '</ui-select>';
             return select;
           });
-          scope.content = input + elementHtml;
           element.append($compile(input + elementHtml)(scope));
         }
       }

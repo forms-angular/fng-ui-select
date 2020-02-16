@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es5",
+    "lib": ["es5", "dom", "es2015.iterable"],
+    "types": ["cypress"]
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude":[
+    "node_modules"
+  ]
+}
