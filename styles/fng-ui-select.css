@@ -21,3 +21,7 @@
 fng-ui-select > .form-group > fng-link > a.fng-link > label {
     margin-top: -5px;
 }
+
+.hidden-row {
+    display: none;
+}

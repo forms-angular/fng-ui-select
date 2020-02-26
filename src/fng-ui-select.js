@@ -173,9 +173,20 @@
           addToConversions(processedAttr.info.name, processedAttr.directiveOptions);
 
           // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
+          // and not with animate (see https://github.com/angular-ui/ui-select/issues/1731 and others)
           var theme = processedAttr.directiveOptions.theme || 'select2';
-          if (processedAttr.info.theme === 'bootstrap' && cssFrameworkService.framework !== 'bs3') {
-            theme = 'select2';
+          if (theme === 'bootstrap') {
+            if (cssFrameworkService.framework() !== 'bs3') {
+              theme = 'select2';
+            } else {
+              try {
+                if (angular.module('ngAnimate')) {
+                  theme = 'select2';
+                }
+              } catch(e) {
+                ;    // module not present, so bootstrap theme will work
+              }
+            }
           }
 
           var multiControl = false;
@@ -210,6 +221,7 @@
             input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
               return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
             });
+            input = input.replace('class="row', 'class="hidden-row row')
           }
 
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
@@ -236,7 +248,7 @@
               defaultPlaceholder = 'Start typing...'
             }
             // set up the ui-select directives
-            var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">';
+            var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">'
             select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || defaultPlaceholder) + '">';
 
 
