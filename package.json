@@ -8,12 +8,12 @@
     "url": "https://github.com/forms-angular/fng-ui-select"
   },
   "dependencies": {
-    "protractor": "^5.4.3",
     "select2": "3.5.1",
     "ui-select": "0.19.8"
   },
   "devDependencies": {
     "cypress": "^4.0.2",
+    "protractor": "^5.4.3",
     "protractor-screenshot-reporter": "0.0.5"
   },
   "engines": {
