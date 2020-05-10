@@ -12,8 +12,8 @@
     "ui-select": "0.19.8"
   },
   "devDependencies": {
-    "cypress": "^4.3.0",
-    "protractor": "^5.4.3",
+    "cypress": "^4.5.0",
+    "protractor": "^5.4.4",
     "protractor-screenshot-reporter": "0.0.5"
   },
   "engines": {
