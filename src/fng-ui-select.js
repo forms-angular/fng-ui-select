@@ -95,13 +95,16 @@
         } else {
           var promise;
           if (elem.filter && elem.filter[0] === '/') {
+            // HACK We want to pass the existing record in e, but we can fall foul of 431 errors if it is large, so we test for that
+            // using an arbitrary number and if so just send the _id (on the assumption that large records won't be new so will have an _id).
+            let record = JSON.stringify($scope.record).length > 20000 ? {_id: $scope.record._id} : $scope.record;
             // Custom URL
             promise = $http({
               method: 'GET',
               url: elem.filter,
               params: {
                 q: searchString,
-                e: $scope.record,
+                e: record,
                 i: $scope.$index
               },
               cache: false
@@ -124,7 +127,7 @@
             }
           })
           .catch(err => {
-            $scope.showError(err.data);
+            $scope.showError(`Error ${err.status}: ${err.statusText} - ${err.data}`);
           });
         }
       } else {
