@@ -98,8 +98,8 @@
             // HACK We want to pass the existing record in e, but we can fall foul of 431 errors if it is large, so we test for that
             // using an arbitrary number and if so just send the _id (on the assumption that large records won't be new so will have an _id).
             // According to https://stackoverflow.com/questions/57431355/how-to-fix-431-request-header-fields-too-large-in-react-redux-app the limit is 8KB
-            // And we are grabbing a few bytes for the other stuff
-            let record = JSON.stringify($scope.record).length >= (8 * 1024 - 200) ? {_id: $scope.record._id} : $scope.record;
+            // And we are being very conservative (it has to be stringified)
+            let record = JSON.stringify($scope.record).length >= (6 * 1024) ? {_id: $scope.record._id} : $scope.record;
             // Custom URL
             promise = $http({
               method: 'GET',
