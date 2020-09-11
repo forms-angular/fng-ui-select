@@ -6,3 +6,5 @@ client
 bower_components
 cypress/fixtures
 cypress/integration/examples
+cypress/videos
+cypress/screenshots
