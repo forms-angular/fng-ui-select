@@ -99,7 +99,7 @@
             // using an arbitrary number and if so just send the _id (on the assumption that large records won't be new so will have an _id).
             // According to https://stackoverflow.com/questions/57431355/how-to-fix-431-request-header-fields-too-large-in-react-redux-app the limit is 8KB
             // but I have seen it fail at about 5k...
-            let record = JSON.stringify($scope.record).length >= (4 * 1024) ? {_id: $scope.record._id} : $scope.record;
+            var record = JSON.stringify($scope.record).length >= (4 * 1024) ? {_id: $scope.record._id} : $scope.record;
             // Custom URL
             promise = $http({
               method: 'GET',
