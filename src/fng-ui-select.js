@@ -128,8 +128,8 @@
               }
             }
           })
-          .catch(err => {
-            $scope.showError(`Error ${err.status}: ${err.statusText} - ${err.data}`);
+          .catch(function(err) {
+            $scope.showError('Error ' + err.status + ': ' + err.statusText + ' - ' + err.data);
           });
         }
       } else {
