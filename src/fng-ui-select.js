@@ -129,7 +129,12 @@
             }
           })
           .catch(function(err) {
-            const msg = err.data?.message || 'Error ' + err.status + ': ' + err.statusText + ' - ' + err.data;
+            var msg;
+            if (err && err.data && err.data.message) {
+              msg = err.data.message;
+            } else {
+              msg = 'Error ' + err.status + ': ' + err.statusText + ' - ' + err.data;
+            }
             $scope.showError(msg);
           });
         }
