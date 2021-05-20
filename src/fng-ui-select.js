@@ -213,6 +213,12 @@
           } else {
             allowClearStr = ' allow-clear';
           }
+          var disabledStr = '';
+          if (processedAttr.directiveOptions.ngdisabled) {
+            disabledStr = ` ng-disabled="${processedAttr.directiveOptions.ngdisabled}"`
+          } else {
+            disabledStr = ' ng-disabled="disabled"';
+          }
 
           // First of all add a hidden input field which we will use to set the width of the select
           if (!angular.element('#' + processedAttr.info.id + '_width-helper').length > 0) {
@@ -254,7 +260,7 @@
               defaultPlaceholder = 'Start typing...'
             }
             // set up the ui-select directives
-            var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + ' theme="' + theme + '" ng-disabled="disabled" style="width:300px;">'
+            var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + disabledStr + ' theme="' + theme + '" style="width:300px;">'
             select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || defaultPlaceholder) + '">';
 
 
