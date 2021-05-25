@@ -236,7 +236,7 @@
               hiddenInputInfo.size = processedAttr.info.size;
             }
             input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
-              return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" style="position: absolute; left: -4200px;">';
+              return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" aria-label="unused input" style="position: absolute; left: -4200px;">';
             });
             input = input.replace('class="row', 'class="hidden-row row')
           }
