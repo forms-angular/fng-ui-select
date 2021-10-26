@@ -1,9 +1,12 @@
 describe('Lists', function () {
 
-  var width = 1024;
+  var width = 1800;
   var height = 1500;
 
   let unique = new Date().valueOf();
+  beforeEach(() => {
+    cy.viewport(width, height);
+  })
 
   it('Creates a new record with multiple shelves', function () {
     cy.visit('/#/k_referencing_self_collection/new');
