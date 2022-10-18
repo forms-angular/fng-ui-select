@@ -175,7 +175,8 @@
           }
 
           var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
-          var elemScope = angular.extend({selectId: processedAttr.info.id}, processedAttr.directiveOptions);
+          const id = processedAttr.info.id;
+          var elemScope = angular.extend({selectId: id}, processedAttr.directiveOptions);
           var multi = processedAttr.info.array;
           var elementHtml;
           var input = '';
@@ -205,7 +206,7 @@
           if (multi && (processedAttr.directiveOptions.fngajax || processedAttr.directiveOptions.forcemultiple)) {
             // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
             // adding an attribute to the schema.
-            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
+            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), id);
             multiControl = true;
           } else {
             multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
@@ -218,17 +219,12 @@
           } else {
             allowClearStr = ' allow-clear';
           }
-          var disabledStr = '';
-          if (processedAttr.directiveOptions.ngdisabled) {
-            disabledStr = ` ng-disabled="${processedAttr.directiveOptions.ngdisabled}"`
-          } else {
-            disabledStr = ' ng-disabled="disabled"';
-          }
+          const disabledStr = pluginHelper.handleReadOnlyDisabled(id, attr);
 
           // First of all add a hidden input field which we will use to set the width of the select
-          if (!angular.element('#' + processedAttr.info.id + '_width-helper').length > 0) {
+          if (!angular.element(`#${id}_width-helper`).length > 0) {
             var hiddenInputInfo = {
-              id: processedAttr.info.id + '_width-helper',
+              id: `${id}_width-helper`,
               name: processedAttr.info.name + '_width-helper',
               label: ''
             };
@@ -278,7 +274,7 @@
               addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
               // Use the forms-angular API to query the referenced collection
               elemScope.ref = processedAttr.info.ref;
-              scope[processedAttr.info.id + '_options'] = [];
+              scope[`${id}_options`] = [];
               if (multiControl) {
                 select += '{{$select.selected.text}}';
               } else if (processedAttr.options.subschema) {
@@ -287,8 +283,8 @@
                 select += '{{' + buildingBlocks.modelString + '.text}}';
               }
               select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in (' + processedAttr.info.id + '_options) track by $index" ';
-              select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
+              select += `<ui-select-choices repeat="option in (${id}_options) track by $index" `;
+              select += `refresh="refreshOptions($select.search, '${id}')" `;
               select += 'refresh-delay="100"> ';
               select += '<div ng-bind-html="option.text"></div>';
             } else if (processedAttr.directiveOptions.deriveoptions) {
