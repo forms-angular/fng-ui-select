@@ -219,11 +219,7 @@
           } else {
             allowClearStr = ' allow-clear';
           }
-          let disabledStr = pluginHelper.handleReadOnlyDisabled(id, attr);
-          // ui-select doesn't deal correctly with a DISABLED attribute - it needs ng-disabled, even when the expression is simply "true"
-          if (disabledStr?.trim().toLowerCase() === "disabled") {
-            disabledStr = 'ng-disabled="true"';
-          }
+          let disabledStr = pluginHelper.handleReadOnlyDisabled(id, attr, true);
 
           // First of all add a hidden input field which we will use to set the width of the select
           if (!angular.element(`#${id}_width-helper`).length > 0) {
