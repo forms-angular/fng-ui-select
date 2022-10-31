@@ -63,7 +63,8 @@
     $scope.uiSelect = $scope.uiSelect || [];
 
     $scope.windowResizeUiSelect = function (checkResize) {
-      // This is to stop the resize firing too often.  Really horrible way of doing it caused by some very regrettable design choices which will be factored out later
+      // This is to stop the resize firing too often.  Really horrible way of doing it caused by some very regrettable
+      // design choices which will be factored out later
       // Actually not choices - just not knowing any better
       if (!checkResize || uiSelectHelper.windowChanged($window.innerWidth, $window.innerHeight)) {
         for (var i = 0; i < $scope.uiSelect.length; i++) {
@@ -151,12 +152,12 @@
     $timeout($scope.windowResizeUiSelect);
   }]);
 
-  uiSelectModule.directive('fngUiSelect', ['$compile', '$window', 'pluginHelper', 'cssFrameworkService', 'formMarkupHelper', 'uiSelectHelper',
-    function ($compile, $window, pluginHelper, cssFrameworkService, formMarkupHelper, uiSelectHelper) {
+  uiSelectModule.directive('fngUiSelect', ['$compile', 'pluginHelper', 'cssFrameworkService', 'uiSelectHelper',
+    function ($compile, pluginHelper, cssFrameworkService, uiSelectHelper) {
       return {
         restrict: 'E',
         controller: 'FngUISelectCtrl',
-        link: function (scope, element, attr) {
+        link: function (scope, element, attrs) {
 
           function addToConversions(path, options) {
             if (Object.keys(options).length > 0) {
@@ -174,18 +175,19 @@
             }
           }
 
-          var processedAttr = pluginHelper.extractFromAttr(attr, 'fngUiSelect');
-          var elemScope = angular.extend({selectId: processedAttr.info.id}, processedAttr.directiveOptions);
-          var multi = processedAttr.info.array;
-          var elementHtml;
-          var input = '';
+          const processedAttrs = pluginHelper.extractFromAttr(attrs, 'fngUiSelect');
+          const id = processedAttrs.info.id;
+          const elemScope = angular.extend({selectId: id}, processedAttrs.directiveOptions);
+          const multi = processedAttrs.info.array;
+          let elementHtml;
+          let input = '';
 
           scope.uiSelect.push(elemScope);
-          addToConversions(processedAttr.info.name, processedAttr.directiveOptions);
+          addToConversions(processedAttrs.info.name, processedAttrs.directiveOptions);
 
           // Sort out the theme, defaulting to select2 (so old users won't see the change).  Bootstrap theme only works with Bootstrap 3
           // and not with animate (see https://github.com/angular-ui/ui-select/issues/1731 and others)
-          var theme = processedAttr.directiveOptions.theme || 'select2';
+          var theme = processedAttrs.directiveOptions.theme || 'select2';
           if (theme === 'bootstrap') {
             if (cssFrameworkService.framework() !== 'bs3') {
               theme = 'select2';
@@ -202,10 +204,10 @@
 
           var multiControl = false;
           var multiStr = '';
-          if (multi && (processedAttr.directiveOptions.fngajax || processedAttr.directiveOptions.forcemultiple)) {
+          if (multi && (processedAttrs.directiveOptions.fngajax || processedAttrs.directiveOptions.forcemultiple)) {
             // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
             // adding an attribute to the schema.
-            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), processedAttr.info.id);
+            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), id);
             multiControl = true;
           } else {
             multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
@@ -213,38 +215,43 @@
 
           var requiredStr = '';
           var allowClearStr = '';
-          if (processedAttr.info.required) {
+          if (processedAttrs.info.required) {
             requiredStr = ' ng-required="true"';
           } else {
             allowClearStr = ' allow-clear';
           }
-          var disabledStr = '';
-          if (processedAttr.directiveOptions.ngdisabled) {
-            disabledStr = ` ng-disabled="${processedAttr.directiveOptions.ngdisabled}"`
-          } else {
-            disabledStr = ' ng-disabled="disabled"';
-          }
+          let disabledStr = pluginHelper.genIdAndDisabledStr(scope, processedAttrs, "", true);
 
           // First of all add a hidden input field which we will use to set the width of the select
-          if (!angular.element('#' + processedAttr.info.id + '_width-helper').length > 0) {
+          if (!angular.element(`#${id}_width-helper`).length > 0) {
             var hiddenInputInfo = {
-              id: processedAttr.info.id + '_width-helper',
-              name: processedAttr.info.name + '_width-helper',
+              id: `${id}_width-helper`,
+              name: processedAttrs.info.name + '_width-helper',
               label: ''
             };
-            if (processedAttr.info.size) {
-              hiddenInputInfo.size = processedAttr.info.size;
+            if (processedAttrs.info.size) {
+              hiddenInputInfo.size = processedAttrs.info.size;
             }
-            input = pluginHelper.buildInputMarkup(scope, attr.model, hiddenInputInfo, processedAttr.options, false, multiControl, function (buildingBlocks) {
-              return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" aria-label="unused input" style="position: absolute; left: -4200px;">';
-            });
+            input = pluginHelper.buildInputMarkup(
+              scope,
+              attrs,
+              {
+                processedAttrs,
+                fieldInfoOverrides: hiddenInputInfo,
+                ignoreFieldInfoFromAttrs: true,
+                needsX: multiControl
+              },
+              function () {
+                return '<input id="' + hiddenInputInfo.id + '" type="text" class="form-control" disabled="" aria-label="unused input" style="position: absolute; left: -4200px;">';
+              }
+            );
             input = input.replace('class="row', 'class="hidden-row row')
           }
 
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
             var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
             if (isObjects) {
-              addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
+              addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc});
               uiSelectHelper.addClientLookup(arrayGetter, scope[array]);
             }
             var select = '';
@@ -259,54 +266,62 @@
             return select;
           }
 
-          elementHtml = pluginHelper.buildInputMarkup(scope, attr.model, processedAttr.info, processedAttr.options, multiControl, multiControl, function (buildingBlocks) {
-            var defaultPlaceholder = 'Select an option...';
-            if (processedAttr.directiveOptions.fngajax) {
-              defaultPlaceholder = 'Start typing...'
-            }
-            // set up the ui-select directives
-            var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + disabledStr + ' theme="' + theme + '" style="min-width:18em;">'
-            select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttr.info.placeholder || defaultPlaceholder) + '">';
+          elementHtml = pluginHelper.buildInputMarkup(
+            scope,
+            attrs,
+            {
+              processedAttrs,
+              addButtons: multiControl,
+              needsX: multiControl,
+            },
+            function (buildingBlocks) {
+              var defaultPlaceholder = 'Select an option...';
+              if (processedAttrs.directiveOptions.fngajax) {
+                defaultPlaceholder = 'Start typing...'
+              }
+              // set up the ui-select directives
+              var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + disabledStr + ' theme="' + theme + '" style="min-width:18em;">'
+              select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttrs.info.placeholder || defaultPlaceholder) + '">';
 
-
-            if (processedAttr.directiveOptions.fngajax) {
-              // Stash any filters
-              if (processedAttr.directiveOptions.fngajax !== true) {
-                elemScope.filter = processedAttr.directiveOptions.fngajax;
-              }
-              // Set up lookup function
-              addToConversions(processedAttr.info.name, {fngajax: uiSelectHelper.lookupFunc});
-              // Use the forms-angular API to query the referenced collection
-              elemScope.ref = processedAttr.info.ref;
-              scope[processedAttr.info.id + '_options'] = [];
-              if (multiControl) {
-                select += '{{$select.selected.text}}';
-              } else if (processedAttr.options.subschema) {
-                select += '{{' + attr.model + '.' + processedAttr.info.name.replace(processedAttr.options.subschemaroot, processedAttr.options.subschemaroot + '[$index]') + '.text}}';
+              if (processedAttrs.directiveOptions.fngajax) {
+                // Stash any filters
+                if (processedAttrs.directiveOptions.fngajax !== true) {
+                  elemScope.filter = processedAttrs.directiveOptions.fngajax;
+                }
+                // Set up lookup function
+                addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc});
+                // Use the forms-angular API to query the referenced collection
+                elemScope.ref = processedAttrs.info.ref;
+                scope[`${id}_options`] = [];
+                if (multiControl) {
+                  select += '{{$select.selected.text}}';
+                } else if (processedAttrs.options.subschema) {
+                  select += '{{' + attrs.model + '.' + processedAttrs.info.name.replace(processedAttrs.options.subschemaroot, processedAttrs.options.subschemaroot + '[$index]') + '.text}}';
+                } else {
+                  select += '{{' + buildingBlocks.modelString + '.text}}';
+                }
+                select += '</ui-select-match>';
+                select += `<ui-select-choices repeat="option in (${id}_options) track by $index" `;
+                select += `refresh="refreshOptions($select.search, '${id}')" `;
+                select += 'refresh-delay="100"> ';
+                select += '<div ng-bind-html="option.text"></div>';
+              } else if (processedAttrs.directiveOptions.deriveoptions) {
+                if (typeof scope[processedAttrs.directiveOptions.deriveoptions] === "function") {
+                  select += optionsFromArray(multiControl, multi, scope[processedAttrs.directiveOptions.deriveoptions](), processedAttrs.directiveOptions.deriveoptions);
+                } else {
+                  throw new Error("In fng-ui-select " + processedAttrs.directiveOptions.deriveoptions + " is not a function on the scope");
+                }
+              } else if (processedAttrs.info.options) {
+                // Simple case - enumerated options on the form scope
+                select += optionsFromArray(multiControl, multi, processedAttrs.info.options);
               } else {
-                select += '{{' + buildingBlocks.modelString + '.text}}';
+                throw new Error('fng-ui-select has no means of populating select');
               }
-              select += '</ui-select-match>';
-              select += '<ui-select-choices repeat="option in (' + processedAttr.info.id + '_options) track by $index" ';
-              select += 'refresh="refreshOptions($select.search, \'' + processedAttr.info.id + '\')" ';
-              select += 'refresh-delay="100"> ';
-              select += '<div ng-bind-html="option.text"></div>';
-            } else if (processedAttr.directiveOptions.deriveoptions) {
-              if (typeof scope[processedAttr.directiveOptions.deriveoptions] === "function") {
-                select += optionsFromArray(multiControl, multi, scope[processedAttr.directiveOptions.deriveoptions](), processedAttr.directiveOptions.deriveoptions);
-              } else {
-                throw new Error("In fng-ui-select " + processedAttr.directiveOptions.deriveoptions + " is not a function on the scope");
-              }
-            } else if (processedAttr.info.options) {
-              // Simple case - enumerated options on the form scope
-              select += optionsFromArray(multiControl, multi, processedAttr.info.options);
-            } else {
-              throw new Error('fng-ui-select has no means of populating select');
+              select += '</ui-select-choices>';
+              select += '</ui-select>';
+              return select;
             }
-            select += '</ui-select-choices>';
-            select += '</ui-select>';
-            return select;
-          });
+          );          
           element.append($compile(input + elementHtml)(scope));
         }
       }
