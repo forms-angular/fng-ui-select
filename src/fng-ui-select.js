@@ -49,13 +49,9 @@
           }
           cb(formSchema, retVal);
         } else {
-          if (typeof value === 'string') {
-            SubmissionsService.getListAttributes(formSchema.ref, value).then(function (response) {
-              cb(formSchema, {id: value, text: response.data.list});
-            });
-          } else {
-            cb(formSchema, value);
-          }
+          SubmissionsService.getListAttributes(formSchema.ref, value).then(function (response) {
+            cb(formSchema, {id: value, text: response.data.list});
+          });
         }
       }
     };
