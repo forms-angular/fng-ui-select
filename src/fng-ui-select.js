@@ -224,7 +224,7 @@
           } else {
             allowClearStr = ' allow-clear';
           }
-          let disabledStr = pluginHelper.genIdAndDisabledStr(scope, processedAttrs, "", true);
+          let disabledStr = pluginHelper.genIdAndDisabledStr(scope, processedAttrs, "", { forceNg: true });
 
           // First of all add a hidden input field which we will use to set the width of the select
           if (!angular.element(`#${id}_width-helper`).length > 0) {
