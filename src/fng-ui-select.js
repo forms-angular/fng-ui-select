@@ -99,7 +99,10 @@
           $scope[id + '_options'] = [];
         } else {
           var promise;
-          if (elem.filter && elem.filter[0] === '/') {
+          if (elem.filter && typeof elem.filter === "string" && elem.filter[0] === "/") {
+            if (elem.filter.startsWith("/api/")) {
+              console.log("WARNING! fng-ui-select is using an /api/ endpoint to refresh options - this is likely to cause security authorisation problems");
+            }
             // HACK We want to pass the existing record in e, but we can fall foul of 431 errors if it is large, so we test for that
             // using an arbitrary number and if so just send the _id (on the assumption that large records won't be new so will have an _id).
             // According to https://stackoverflow.com/questions/57431355/how-to-fix-431-request-header-fields-too-large-in-react-redux-app the limit is 8KB
