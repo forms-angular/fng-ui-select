@@ -287,6 +287,17 @@
                 defaultPlaceholder = 'Start typing...'
               }
               // set up the ui-select directives
+              // hack here.  buildingBlocks.common will almost certainly contain 'id="xxxx"', but we don't want this because the
+              // id will already be in disabledStr.  remove it.
+              // the right solution here would be to include an option in the params that are passed to buildInputMarkup which
+              // specifies whether or not the buildingBlocks that it creates should include the id or not.
+              const idIdx = buildingBlocks.common.indexOf('id="');
+              if (idIdx > -1) {
+                const endIdIdx = buildingBlocks.common.indexOf('"', idIdx+4);
+                if (endIdIdx > -1) {
+                  buildingBlocks.common = buildingBlocks.common.substring(0, idIdx) + buildingBlocks.common.substring(endIdIdx + 1);
+                }
+              }
               var select = '<ui-select ' + multiStr + buildingBlocks.common + requiredStr + disabledStr + ' theme="' + theme + '" style="min-width:18em;">'
               select += '<ui-select-match' + allowClearStr + ' placeholder="' + (processedAttrs.info.placeholder || defaultPlaceholder) + '">';
 
