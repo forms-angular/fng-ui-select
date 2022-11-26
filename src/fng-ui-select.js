@@ -3,9 +3,42 @@
 
   var uiSelectModule = angular.module('fng.uiSelect', ['ui.select']);
 
-  uiSelectModule.factory('uiSelectHelper', ['$rootScope', '$q', 'SubmissionsService', function ($rootScope, $q, SubmissionsService) {
+  uiSelectModule.factory('uiSelectHelper', ['$rootScope', '$q', 'recordHandler', 'SubmissionsService', function ($rootScope, $q, recordHandler, SubmissionsService) {
     var lastW, lastH;
-    var localLookups = {};
+    const localLookups = {};
+    // this ultra-simple cache stores { [id: string]: stringValue } as a means of avoiding unnecessary network round-trips, and the UI refresh
+    // lagging caused by the promises used to make them.
+    // there is no cache life-span because all we're storing here is the concatenation of records' list fields, and the chances of those
+    // changing while present in this cache is miniscule.  even if they did change, displaying a stale record description in a picklist
+    // would surely not cause any great concern.
+    // there is no cache size limit because we're storing tiny amounts of data.
+    // NB: this cache assumes that record ids are unique across all resources (as is the case with a standard MongoDB back-end).
+    // TODO: provide an alternative implementation that includes the resourceName in the cache ids to avoid this limitation.
+    const valueCache = {};
+    // we're going to populate the select with this value whenever a SubmissionsService.getListAttributes(...) call is rejected.  because we're
+    // only asking for list fields, permissions should not be the cause of failures, making "record not found" (where the foreign key
+    // reference has been broken) by far the most likely explanation.
+    // TODO: interpret the actual error condition and translate this into a user-friendly message
+    const RECORD_NOT_FOUND = "record not found";
+
+    function useCacheOrLookItUp(resourceName, id, cb) {
+      if (valueCache[id]) {
+        cb(valueCache[id]);
+      } else 
+        var text;
+        SubmissionsService.getListAttributes(resourceName, id)
+          .then((response) => {
+            text = response.data.list;
+          })
+          .catch(() => {
+            text = RECORD_NOT_FOUND; // cache this as well as there's no point in repeatedly performing a failing lookup
+          })
+          .finally(() => {
+            cb(text);
+            valueCache[id] = text;
+          })
+    }
+
     return {
       windowChanged: function (w, h) {
         var result = false;
@@ -21,41 +54,45 @@
       },
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
-          // TODO extend back end to do multiple lookups in one hit
-
-          var promises = [];
-          var results = [];
-          angular.forEach(value, function (obj) {
-            promises.push(SubmissionsService.getListAttributes(formSchema.ref, obj.x));
+          const promises = value.map((value) => {
+            const id = value.x?.id || value.x; // if it's already been converted, throw away the result of the previous conversion
+            if (!id) {
+              return $q.resolve({ data: { list: ""} }); // nothing to convert
+            } else if (valueCache[id]) {
+              return $q.resolve({ data: { list: valueCache[id] }}); // already cached
+            } else {
+              return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
+            }
           });
-          $q.all(promises).then(function (responses) {
-            angular.forEach(responses, function (response) {
-              results.push({x: {id: value.shift().x, text: response.data.list}});
+          // TODO: no error handling here
+          // TODO: perform lookups of cache misses using a single round-trip
+          $q.all(promises).then((responses) => {
+            const results = responses.map((response) => {
+              let id = value.shift().x;
+              id = id.id || id; // in case it's already been converted
+              const text = response.data.list
+              valueCache[id] = text; // cache it for next time
+              return { id, text }
             });
             cb(formSchema, results);
             setTimeout(function () {
               $rootScope.$digest();
             });
           });
+        } else if (typeof value !== "string") {
+          cb(formSchema, value); // already converted
         } else if (formSchema.fngUiSelect.deriveOptions) {
-          var retVal;
-          if (typeof value === 'string') {
-            var obj = localLookups[formSchema.fngUiSelect.deriveOptions].find(function (test) {
-              return test.id == value
-            });
-            retVal = {id: value, text: obj ? obj.text : ''}
-          } else {
-            retVal = value;
-          }
-          cb(formSchema, retVal);
+          const obj = localLookups[formSchema.fngUiSelect.deriveOptions].find((test) => test.id === value);
+          cb(formSchema, { id: value, text: obj?.text || "" });
         } else {
-          if (typeof value === 'string') {
-            SubmissionsService.getListAttributes(formSchema.ref, value).then(function (response) {
-              cb(formSchema, {id: value, text: response.data.list});
-            });
-          } else {
-            cb(formSchema, value);
-          }
+          useCacheOrLookItUp(formSchema.ref, value, (text) => { cb(formSchema, { id: value, text }) });
+        }
+      },
+      doOwnConversion: function(scope, processedAttrs, ref) {
+        var id = recordHandler.getData(scope.record, processedAttrs.info.name, scope.$index);
+        if (id) {
+          id = id.id || id; // in case it's already been converted
+          useCacheOrLookItUp(ref, id, (text) => { recordHandler.setData(scope.record, processedAttrs.info.name, scope.$index, { id, text }) });
         }
       }
     };
@@ -184,7 +221,8 @@
 
           const processedAttrs = pluginHelper.extractFromAttr(attrs, 'fngUiSelect');
           const id = processedAttrs.info.id;
-          const elemScope = angular.extend({selectId: id}, processedAttrs.directiveOptions);
+          const uniqueId = scope.$index !== undefined ? processedAttrs.info.id + "_" + scope.$index : id;
+          const elemScope = angular.extend({selectId: uniqueId}, processedAttrs.directiveOptions);
           const multi = processedAttrs.info.array;
           let elementHtml;
           let input = '';
@@ -230,9 +268,9 @@
           let disabledStr = pluginHelper.genIdAndDisabledStr(scope, processedAttrs, "", { forceNg: true });
 
           // First of all add a hidden input field which we will use to set the width of the select
-          if (!angular.element(`#${id}_width-helper`).length > 0) {
+          if (!angular.element(`#${uniqueId}_width-helper`).length > 0) {
             var hiddenInputInfo = {
-              id: `${id}_width-helper`,
+              id: `${uniqueId}_width-helper`,
               name: processedAttrs.info.name + '_width-helper',
               label: ''
             };
@@ -306,11 +344,32 @@
                 if (processedAttrs.directiveOptions.fngajax !== true) {
                   elemScope.filter = processedAttrs.directiveOptions.fngajax;
                 }
-                // Set up lookup function
-                addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc});
-                // Use the forms-angular API to query the referenced collection
-                elemScope.ref = processedAttrs.info.ref;
-                scope[`${id}_options`] = [];
+                // if we have a hard-coded ref (processedAttrs.info.ref), forms-angular can perform the lookup conversion for us.
+                // where processedAttrs.directiveOptions.refprop is being used instead, the ref is 'variable' - it comes from a property of scope.record, and
+                // in this case, we'll need to handle the conversions ourselves.
+                addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc, noconvert: !!processedAttrs.directiveOptions.refprop});
+                if (processedAttrs.directiveOptions.refprop) {
+                  // the property that we'll be getting the ref from may not be populated yet, and might conceivably change at any time, so we
+                  // need to $watch it.  buildingBlocks.modelString will be something like "record.<array>[$index].<field>".  replacing <field>
+                  // with the value of refprop will give us a suitable watch expression.
+                  const watchStr = buildingBlocks.modelString.substring(0, buildingBlocks.modelString.lastIndexOf(".") + 1) + processedAttrs.directiveOptions.refprop;
+                  scope.$watch(watchStr, (newValue) => {
+                    if (newValue && elemScope.ref !== newValue) {
+                      elemScope.ref = newValue;
+                      uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
+                    }
+                  });
+                  // we also need to re-do the conversion if the user cancels changes.  this event does fire on more than just user cancellation,
+                  // so this is slightly wasteful.  but with the caching implemented by uiSelectHelper, this is no big deal.
+                  scope.$on("fngCancel", () => {
+                    if (elemScope.ref) {
+                      uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
+                    }
+                  });
+                } else {
+                  elemScope.ref = processedAttrs.info.ref;
+                }                
+                scope[`${uniqueId}_options`] = [];
                 if (multiControl) {
                   select += '{{$select.selected.text}}';
                 } else if (processedAttrs.options.subschema) {
@@ -319,8 +378,8 @@
                   select += '{{' + buildingBlocks.modelString + '.text}}';
                 }
                 select += '</ui-select-match>';
-                select += `<ui-select-choices repeat="option in (${id}_options) track by $index" `;
-                select += `refresh="refreshOptions($select.search, '${id}')" `;
+                select += `<ui-select-choices repeat="option in (${uniqueId}_options) track by $index" `;
+                select += `refresh="refreshOptions($select.search, '${uniqueId}')" `;
                 select += 'refresh-delay="400"> ';
                 select += '<div ng-bind-html="::option.text" ng-attr-title="{{ ::option.text }}"></div>';
               } else if (processedAttrs.directiveOptions.deriveoptions) {
