@@ -196,8 +196,8 @@
     $timeout($scope.windowResizeUiSelect);
   }]);
 
-  uiSelectModule.directive('fngUiSelect', ['$compile', 'pluginHelper', 'cssFrameworkService', 'uiSelectHelper',
-    function ($compile, pluginHelper, cssFrameworkService, uiSelectHelper) {
+  uiSelectModule.directive('fngUiSelect', ['$compile', 'pluginHelper', 'cssFrameworkService', 'uiSelectHelper', '$timeout',
+    function ($compile, pluginHelper, cssFrameworkService, uiSelectHelper, $timeout) {
       return {
         restrict: 'E',
         controller: 'FngUISelectCtrl',
@@ -262,6 +262,8 @@
           var allowClearStr = '';
           if (processedAttrs.info.required) {
             requiredStr = ' ng-required="true"';
+          } else if (processedAttrs.directiveOptions.ngrequired) {
+            requiredStr = ` ng-required="${processedAttrs.directiveOptions.ngrequired}"`;
           } else {
             allowClearStr = ' allow-clear';
           }
@@ -362,9 +364,11 @@
                   // we also need to re-do the conversion if the user cancels changes.  this event does fire on more than just user cancellation,
                   // so this is slightly wasteful.  but with the caching implemented by uiSelectHelper, this is no big deal.
                   scope.$on("fngCancel", () => {
-                    if (elemScope.ref) {
-                      uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
-                    }
+                    $timeout(() => {
+                      if (elemScope.ref) {
+                        uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
+                      }
+                    });
                   });
                 } else {
                   elemScope.ref = processedAttrs.info.ref;
