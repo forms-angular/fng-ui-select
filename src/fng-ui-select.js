@@ -385,7 +385,7 @@
                 select += `<ui-select-choices repeat="option in (${uniqueId}_options) track by $index" `;
                 select += `refresh="refreshOptions($select.search, '${uniqueId}')" `;
                 select += 'refresh-delay="400"> ';
-                select += '<div ng-bind-html="::option.text" ng-attr-title="{{ ::option.text }}"></div>';
+                select += '<div ng-bind-html="option.text" ng-attr-title="{{ option.text }}"></div>';
               } else if (processedAttrs.directiveOptions.deriveoptions) {
                 if (typeof scope[processedAttrs.directiveOptions.deriveoptions] === "function") {
                   select += optionsFromArray(multiControl, multi, scope[processedAttrs.directiveOptions.deriveoptions](), processedAttrs.directiveOptions.deriveoptions);
