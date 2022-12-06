@@ -14,7 +14,7 @@
     // there is no cache size limit because we're storing tiny amounts of data.
     // NB: this cache assumes that record ids are unique across all resources (as is the case with a standard MongoDB back-end).
     // TODO: provide an alternative implementation that includes the resourceName in the cache ids to avoid this limitation.
-    const valueCache = {};
+    let valueCache = {};
     // we're going to populate the select with this value whenever a SubmissionsService.getListAttributes(...) call is rejected.  because we're
     // only asking for list fields, permissions should not be the cause of failures, making "record not found" (where the foreign key
     // reference has been broken) by far the most likely explanation.
@@ -24,7 +24,7 @@
     function useCacheOrLookItUp(resourceName, id, cb) {
       if (valueCache[id]) {
         cb(valueCache[id]);
-      } else 
+      } else {
         var text;
         SubmissionsService.getListAttributes(resourceName, id)
           .then((response) => {
@@ -37,6 +37,7 @@
             cb(text);
             valueCache[id] = text;
           })
+      }
     }
 
     return {
@@ -51,6 +52,9 @@
       },
       addClientLookup: function (lkpName, lkpData) {
         localLookups[lkpName] = lkpData;
+      },
+      clearCache: function () {
+        valueCache = {};
       },
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
