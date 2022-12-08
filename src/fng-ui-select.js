@@ -5,7 +5,39 @@
 
   uiSelectModule.factory('uiSelectHelper', ['$rootScope', '$q', 'SubmissionsService', function ($rootScope, $q, SubmissionsService) {
     var lastW, lastH;
-    var localLookups = {};
+    const localLookups = {};
+    // this ultra-simple cache stores { [id: string]: stringValue } as a means of avoiding unnecessary network round-trips, and the UI refresh
+    // lagging caused by the promises used to make them.
+    // there is no cache life-span because all we're storing here is the concatenation of records' list fields, and the chances of those
+    // changing while present in this cache is miniscule.  even if they did change, displaying a stale record description in a picklist
+    // would surely not cause any great concern.
+    // there is no cache size limit because we're storing tiny amounts of data.
+    // NB: this cache assumes that record ids are unique across all resources (as is the case with a standard MongoDB back-end).
+    // TODO: provide an alternative implementation that includes the resourceName in the cache ids to avoid this limitation.
+    let valueCache = {};
+    // we're going to populate the select with this value whenever a SubmissionsService.getListAttributes(...) call is rejected.  because we're
+    // only asking for list fields, permissions should not be the cause of failures, making "record not found" (where the foreign key
+    // reference has been broken) by far the most likely explanation.
+    // TODO: interpret the actual error condition and translate this into a user-friendly message
+    const RECORD_NOT_FOUND = "record not found";
+
+    function useCacheOrLookItUp(resourceName, id, cb) {
+      if (valueCache[id]) {
+        cb(valueCache[id]);
+      } else 
+        var text;
+        SubmissionsService.getListAttributes(resourceName, id)
+          .then((response) => {
+            text = response.data.list;
+          })
+          .catch(() => {
+            text = RECORD_NOT_FOUND; // cache this as well as there's no point in repeatedly performing a failing lookup
+          })
+          .finally(() => {
+            cb(text);
+            valueCache[id] = text;
+          })
+    }
     return {
       windowChanged: function (w, h) {
         var result = false;
@@ -19,41 +51,45 @@
       addClientLookup: function (lkpName, lkpData) {
         localLookups[lkpName] = lkpData;
       },
+      clearCache: function () {
+        valueCache = {};
+      },
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
-          // TODO extend back end to do multiple lookups in one hit
-
-          var promises = [];
-          var results = [];
-          angular.forEach(value, function (obj) {
-            promises.push(SubmissionsService.getListAttributes(formSchema.ref, obj.x));
+          const promises = value.map((value) => {
+            const id = value.x?.id || value.x; // if it's already been converted, throw away the result of the previous conversion
+            if (!id) {
+              return $q.resolve({ data: { list: ""} }); // nothing to convert
+            } else if (valueCache[id]) {
+              return $q.resolve({ data: { list: valueCache[id] }}); // already cached
+            } else {
+              return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
+            }
           });
-          $q.all(promises).then(function (responses) {
-            angular.forEach(responses, function (response) {
-              results.push({x: {id: value.shift().x, text: response.data.list}});
+          // TODO: no error handling here
+          // TODO: perform lookups of cache misses using a single round-trip
+          $q.all(promises).then((responses) => {
+            const results = responses.map((response) => {
+              let id = value.shift().x;
+              id = id.id || id; // in case it's already been converted
+              const text = response.data.list
+              valueCache[id] = text; // cache it for next time
+              return { id, text }
             });
             cb(formSchema, results);
             setTimeout(function () {
               $rootScope.$digest();
             });
           });
+        } else if (typeof value !== "string") {
+          cb(formSchema, value); // already converted
         } else if (formSchema.fngUiSelect.deriveOptions) {
-          var retVal;
-          if (typeof value === 'string') {
-            var obj = localLookups[formSchema.fngUiSelect.deriveOptions].find(function (test) {
-              return test.id == value
-            });
-            retVal = {id: value, text: obj ? obj.text : ''}
-          } else {
-            retVal = value;
-          }
-          cb(formSchema, retVal);
+          const obj = localLookups[formSchema.fngUiSelect.deriveOptions].find((test) => test.id === value);
+          cb(formSchema, { id: value, text: obj?.text || "" });
         } else {
-          SubmissionsService.getListAttributes(formSchema.ref, value).then(function (response) {
-            cb(formSchema, {id: value, text: response.data.list});
-          });
+          useCacheOrLookItUp(formSchema.ref, value, (text) => { cb(formSchema, { id: value, text }) });
         }
-      }
+      },
     };
   }]);
 
