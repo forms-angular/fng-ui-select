@@ -59,7 +59,7 @@
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
           const promises = value.map((value) => {
-            const id = value.x?.id || value.x; // if it's already been converted, throw away the result of the previous conversion
+            const id = value.x ? (value.x.id || value.x) : undefined; // if it's already been converted, throw away the result of the previous conversion
             if (!id) {
               return $q.resolve({ data: { list: ""} }); // nothing to convert
             } else if (valueCache[id]) {
@@ -87,7 +87,7 @@
           cb(formSchema, value); // already converted
         } else if (formSchema.fngUiSelect.deriveOptions) {
           const obj = localLookups[formSchema.fngUiSelect.deriveOptions].find((test) => test.id === value);
-          cb(formSchema, { id: value, text: obj?.text || "" });
+          cb(formSchema, { id: value, text: obj ? obj.text : "" });
         } else {
           useCacheOrLookItUp(formSchema.ref, value, (text) => { cb(formSchema, { id: value, text }) });
         }
