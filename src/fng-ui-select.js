@@ -58,31 +58,44 @@
       },
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
-          const promises = value.map((value) => {
-            const id = value.x ? (value.x.id || value.x) : undefined; // if it's already been converted, throw away the result of the previous conversion
-            if (!id) {
-              return $q.resolve({ data: { list: ""} }); // nothing to convert
-            } else if (valueCache[id]) {
-              return $q.resolve({ data: { list: valueCache[id] }}); // already cached
-            } else {
-              return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
-            }
-          });
-          // TODO: no error handling here
-          // TODO: perform lookups of cache misses using a single round-trip
-          $q.all(promises).then((responses) => {
-            const results = responses.map((response) => {
-              let id = value.shift().x;
-              id = id.id || id; // in case it's already been converted
-              const text = response.data.list
-              valueCache[id] = text; // cache it for next time
-              return { id, text }
+          if (formSchema.fngUiSelect.deriveOptions) {
+            const results = value.map((value) => {
+              const obj = localLookups[formSchema.fngUiSelect.deriveOptions].find((test) => test.id === value);
+              return { id: value, text: obj ? obj.text : "" };
             });
             cb(formSchema, results);
-            setTimeout(function () {
-              $rootScope.$digest();
+            if (results.length > 0) {
+              setTimeout(function () {
+                $rootScope.$digest();
+              });
+            }
+          } else {
+            const promises = value.map((value) => {
+              const id = value.x ? (value.x.id || value.x) : value; // if it's already been converted, throw away the result of the previous conversion
+              if (!id) {
+                return $q.resolve({ data: { list: ""} }); // nothing to convert
+              } else if (valueCache[id]) {
+                return $q.resolve({ data: { list: valueCache[id] }}); // already cached
+              } else {
+                return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
+              }
             });
-          });
+            // TODO: no error handling here
+            // TODO: perform lookups of cache misses using a single round-trip
+            $q.all(promises).then((responses) => {
+              const results = responses.map((response) => {
+                let id = value.shift().x;
+                id = id.id || id; // in case it's already been converted
+                const text = response.data.list
+                valueCache[id] = text; // cache it for next time
+                return { id, text }
+              });
+              cb(formSchema, results);
+              setTimeout(function () {
+                $rootScope.$digest();
+              });
+            });
+          }
         } else if (typeof value !== "string") {
           cb(formSchema, value); // already converted
         } else if (formSchema.fngUiSelect.deriveOptions) {
@@ -309,7 +322,7 @@
             if (multiControl) {
               select += '{{$select.selected' + (isObjects ? '.text' : '') + '}}';
             } else {
-              select += multi ? '{{$item}}' : ('{{$select.selected' + (isObjects ? '.text' : '') + '}}');
+              select += multi ? '{{$item' + (isObjects ? '.text' : '') + '}}' : ('{{$select.selected' + (isObjects ? '.text' : '') + '}}');
             }
             select += '</ui-select-match>';
             select += '<ui-select-choices repeat="option in ' + array + ' | filter:$select.search">';
