@@ -3,7 +3,7 @@
 
   var uiSelectModule = angular.module('fng.uiSelect', ['ui.select']);
 
-  uiSelectModule.factory('uiSelectHelper', ['$rootScope', '$q', 'recordHandler', 'SubmissionsService', function ($rootScope, $q, recordHandler, SubmissionsService) {
+  uiSelectModule.factory('FngUISelectHelperService', ['$rootScope', '$q', 'RecordHandlerService', 'SubmissionsService', function ($rootScope, $q, RecordHandlerService, SubmissionsService) {
     var lastW, lastH;
     const localLookups = {};
     // this ultra-simple cache stores { [id: string]: stringValue } as a means of avoiding unnecessary network round-trips, and the UI refresh
@@ -40,6 +40,7 @@
       }
     }
 
+    // NB: the type defs for this service (IFngUISelectHelperService) are in the forms-angular's index.d.ts
     return {
       windowChanged: function (w, h) {
         var result = false;
@@ -106,17 +107,17 @@
         }
       },
       doOwnConversion: function(scope, processedAttrs, ref) {
-        var id = recordHandler.getData(scope.record, processedAttrs.info.name, scope.$index);
+        var id = RecordHandlerService.getData(scope.record, processedAttrs.info.name, scope.$index);
         if (id) {
           id = id.id || id; // in case it's already been converted
-          useCacheOrLookItUp(ref, id, (text) => { recordHandler.setData(scope.record, processedAttrs.info.name, scope.$index, { id, text }) });
+          useCacheOrLookItUp(ref, id, (text) => { RecordHandlerService.setData(scope.record, processedAttrs.info.name, scope.$index, { id, text }) });
         }
       }
     };
   }]);
 
 
-  uiSelectModule.controller('FngUISelectCtrl', ['$scope', '$window', '$timeout', '$http', 'uiSelectHelper', function ($scope, $window, $timeout, $http, uiSelectHelper) {
+  uiSelectModule.controller('FngUISelectCtrl', ['$scope', '$window', '$timeout', '$http', 'FngUISelectHelperService', function ($scope, $window, $timeout, $http, FngUISelectHelperService) {
 
     $scope.uiSelect = $scope.uiSelect || [];
 
@@ -124,7 +125,7 @@
       // This is to stop the resize firing too often.  Really horrible way of doing it caused by some very regrettable
       // design choices which will be factored out later
       // Actually not choices - just not knowing any better
-      if (!checkResize || uiSelectHelper.windowChanged($window.innerWidth, $window.innerHeight)) {
+      if (!checkResize || FngUISelectHelperService.windowChanged($window.innerWidth, $window.innerHeight)) {
         for (var i = 0; i < $scope.uiSelect.length; i++) {
           var selectId = $scope.uiSelect[i].selectId;
           var select = document.getElementById(selectId);
@@ -213,8 +214,8 @@
     $timeout($scope.windowResizeUiSelect);
   }]);
 
-  uiSelectModule.directive('fngUiSelect', ['$compile', 'pluginHelper', 'cssFrameworkService', 'uiSelectHelper', '$timeout',
-    function ($compile, pluginHelper, cssFrameworkService, uiSelectHelper, $timeout) {
+  uiSelectModule.directive('fngUiSelect', ['$compile', 'PluginHelperService', 'CssFrameworkService', 'FngUISelectHelperService', '$timeout',
+    function ($compile, PluginHelperService, CssFrameworkService, FngUISelectHelperService, $timeout) {
       return {
         restrict: 'E',
         controller: 'FngUISelectCtrl',
@@ -236,7 +237,7 @@
             }
           }
 
-          const processedAttrs = pluginHelper.extractFromAttr(attrs, 'fngUiSelect');
+          const processedAttrs = PluginHelperService.extractFromAttr(attrs, 'fngUiSelect');
           const id = processedAttrs.info.id;
           const uniqueId = scope.$index !== undefined ? processedAttrs.info.id + "_" + scope.$index : id;
           const elemScope = angular.extend({selectId: uniqueId}, processedAttrs.directiveOptions);
@@ -251,7 +252,7 @@
           // and not with animate (see https://github.com/angular-ui/ui-select/issues/1731 and others)
           var theme = processedAttrs.directiveOptions.theme || 'select2';
           if (theme === 'bootstrap') {
-            if (cssFrameworkService.framework() !== 'bs3') {
+            if (CssFrameworkService.framework() !== 'bs3') {
               theme = 'select2';
             } else {
               try {
@@ -269,7 +270,7 @@
           if (multi && (processedAttrs.directiveOptions.fngajax || processedAttrs.directiveOptions.forcemultiple)) {
             // We need the array to be an array of objects with a x property.  This tells forms-angular to convert it by
             // adding an attribute to the schema.
-            pluginHelper.findIdInSchemaAndFlagNeedX(scope.baseSchema(), id);
+            PluginHelperService.findIdInSchemaAndFlagNeedX(scope.baseSchema(), id);
             multiControl = true;
           } else {
             multiStr = multi ? 'multiple close-on-select reset-search-input ' : '';
@@ -284,7 +285,7 @@
           } else {
             allowClearStr = ' allow-clear';
           }
-          let disabledStr = pluginHelper.genIdAndDisabledStr(scope, processedAttrs, "", { forceNg: true });
+          let disabledStr = PluginHelperService.genIdAndDisabledStr(scope, processedAttrs, "", { forceNg: true });
 
           // First of all add a hidden input field which we will use to set the width of the select
           if (!angular.element(`#${uniqueId}_width-helper`).length > 0) {
@@ -296,7 +297,7 @@
             if (processedAttrs.info.size) {
               hiddenInputInfo.size = processedAttrs.info.size;
             }
-            input = pluginHelper.buildInputMarkup(
+            input = PluginHelperService.buildInputMarkup(
               scope,
               attrs,
               {
@@ -315,8 +316,8 @@
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
             var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
             if (isObjects) {
-              addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc});
-              uiSelectHelper.addClientLookup(arrayGetter, scope[array]);
+              addToConversions(processedAttrs.info.name, {fngajax: FngUISelectHelperService.lookupFunc});
+              FngUISelectHelperService.addClientLookup(arrayGetter, scope[array]);
             }
             var select = '';
             if (multiControl) {
@@ -330,7 +331,7 @@
             return select;
           }
 
-          elementHtml = pluginHelper.buildInputMarkup(
+          elementHtml = PluginHelperService.buildInputMarkup(
             scope,
             attrs,
             {
@@ -366,7 +367,7 @@
                 // if we have a hard-coded ref (processedAttrs.info.ref), forms-angular can perform the lookup conversion for us.
                 // where processedAttrs.directiveOptions.refprop is being used instead, the ref is 'variable' - it comes from a property of scope.record, and
                 // in this case, we'll need to handle the conversions ourselves.
-                addToConversions(processedAttrs.info.name, {fngajax: uiSelectHelper.lookupFunc, noconvert: !!processedAttrs.directiveOptions.refprop});
+                addToConversions(processedAttrs.info.name, {fngajax: FngUISelectHelperService.lookupFunc, noconvert: !!processedAttrs.directiveOptions.refprop});
                 if (processedAttrs.directiveOptions.refprop) {
                   // the property that we'll be getting the ref from may not be populated yet, and might conceivably change at any time, so we
                   // need to $watch it.  buildingBlocks.modelString will be something like "record.<array>[$index].<field>".  replacing <field>
@@ -375,7 +376,7 @@
                   scope.$watch(watchStr, (newValue) => {
                     if (newValue && elemScope.ref !== newValue) {
                       elemScope.ref = newValue;
-                      uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
+                      FngUISelectHelperService.doOwnConversion(scope, processedAttrs, elemScope.ref);
                     }
                   });
                   // we also need to re-do the conversion if the user cancels changes.  this event does fire on more than just user cancellation,
@@ -383,7 +384,7 @@
                   scope.$on("fngCancel", () => {
                     $timeout(() => {
                       if (elemScope.ref) {
-                        uiSelectHelper.doOwnConversion(scope, processedAttrs, elemScope.ref);
+                        FngUISelectHelperService.doOwnConversion(scope, processedAttrs, elemScope.ref);
                       }
                     });
                   });
