@@ -237,7 +237,7 @@
             }
           }
 
-          const processedAttrs = PluginHelperService.extractFromAttr(attrs, 'fngUiSelect');
+          const processedAttrs = PluginHelperService.extractFromAttr(attrs, 'fngUiSelect', scope);
           const id = processedAttrs.info.id;
           const uniqueId = scope.$index !== undefined ? processedAttrs.info.id + "_" + scope.$index : id;
           const elemScope = angular.extend({selectId: uniqueId}, processedAttrs.directiveOptions);
