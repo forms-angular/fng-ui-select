@@ -11,9 +11,6 @@
     "select2": "3.5.1",
     "ui-select": "0.19.8"
   },
-  "devDependencies": {
-    "cypress": "^9"
-  },
   "engines": {
     "node": ">=0.10.0"
   },
@@ -22,8 +19,12 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "npx cypress run --spec cypress/integration/lists.spec.js",
+    "test": "npx playwright test '.js'",
     "old-test": "NODE_ENV=test node ../forms-angular/website/server.js & npx webdriver-manager update --versions.chrome=$(google-chrome --version | cut -d ' ' -f 3) && npx webdriver-manager start --versions.chrome=$(google-chrome --version | cut -d ' ' -f 3) & npx protractor test/e2e/protractor/protractor-chrome.conf.js",
     "clear": "kill `ps -ef | grep '[0-9] node ../forms-angular/website/server.js' | egrep -o ' ([0-9]+) ' | head -1 | sed -e 's/ //'` -9"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "@types/node": "^20.11.29"
   }
 }
