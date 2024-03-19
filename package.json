@@ -12,7 +12,7 @@
     "ui-select": "0.19.8"
   },
   "devDependencies": {
-    "cypress": "^9"
+    "cypress": "^13"
   },
   "engines": {
     "node": ">=0.10.0"
