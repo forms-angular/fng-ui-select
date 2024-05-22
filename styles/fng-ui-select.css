@@ -14,15 +14,15 @@
     background-color: rgba(255, 0, 0, 0.10);
 }
 
-fng-ui-select div[id$="width-helper"] {
+fng-ui-select div[id*="width-helper"] {
     margin-bottom: 0px!important;
 }
 
-fng-ui-select div[id$="width-helper"] div {
+fng-ui-select div[id*="width-helper"] div {
     min-height: 0px;
 }
 
-fng-ui-select div[id$="width-helper"] label.control-label {
+fng-ui-select div[id*="width-helper"] label.control-label {
     padding-top: 0px!important;
     min-height: 0px!important;
 }
