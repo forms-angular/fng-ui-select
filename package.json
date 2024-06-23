@@ -24,7 +24,7 @@
     "clear": "kill `ps -ef | grep '[0-9] node ../forms-angular/website/server.js' | egrep -o ' ([0-9]+) ' | head -1 | sed -e 's/ //'` -9"
   },
   "devDependencies": {
-    "@playwright/test": "^1.42.1",
-    "@types/node": "^20.11.29"
+    "@playwright/test": "^1.44.1",
+    "@types/node": "^20.14.8"
   }
 }
