@@ -8,8 +8,8 @@
     "url": "https://github.com/forms-angular/fng-ui-select"
   },
   "dependencies": {
-    "select2": "3.5.1",
-    "ui-select": "0.19.8"
+    "select2":"^3.5.1",
+    "ui-select":"^0.19.8"
   },
   "engines": {
     "node": ">=0.10.0"
