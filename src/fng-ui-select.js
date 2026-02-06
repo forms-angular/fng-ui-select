@@ -74,9 +74,9 @@
             const promises = value.map((value) => {
               const id = value.x ? (value.x.id || value.x) : value; // if it's already been converted, throw away the result of the previous conversion
               if (!id) {
-                return $q.resolve({ data: { list: ""} }); // nothing to convert
+                return $q.resolve({ data: { list: "" } }); // nothing to convert
               } else if (valueCache[id]) {
-                return $q.resolve({ data: { list: valueCache[id] }}); // already cached
+                return $q.resolve({ data: { list: valueCache[id] } }); // already cached
               } else {
                 return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
               }
@@ -106,7 +106,7 @@
           useCacheOrLookItUp(formSchema.ref, value, (text) => { cb(formSchema, { id: value, text }) });
         }
       },
-      doOwnConversion: function(scope, processedAttrs, ref) {
+      doOwnConversion: function (scope, processedAttrs, ref) {
         var id = RecordHandlerService.getData(scope.record, processedAttrs.info.name, scope.$index);
         if (id) {
           id = id.id || id; // in case it's already been converted
@@ -162,7 +162,7 @@
             // using an arbitrary number and if so just send the _id (on the assumption that large records won't be new so will have an _id).
             // According to https://stackoverflow.com/questions/57431355/how-to-fix-431-request-header-fields-too-large-in-react-redux-app the limit is 8KB
             // but I have seen it fail at about 5k...
-            var record = JSON.stringify($scope.record).length >= (4 * 1024) ? {_id: $scope.record._id} : $scope.record;
+            var record = JSON.stringify($scope.record).length >= (4 * 1024) ? { _id: $scope.record._id } : $scope.record;
             // Custom URL
             promise = $http({
               method: 'GET',
@@ -191,15 +191,15 @@
               }
             }
           })
-          .catch(function(err) {
-            var msg;
-            if (err && err.data && err.data.message) {
-              msg = err.data.message;
-            } else {
-              msg = 'Error ' + err.status + ': ' + err.statusText + ' - ' + err.data;
-            }
-            $scope.showError(msg);
-          });
+            .catch(function (err) {
+              var msg;
+              if (err && err.data && err.data.message) {
+                msg = err.data.message;
+              } else {
+                msg = 'Error ' + err.status + ': ' + err.statusText + ' - ' + err.data;
+              }
+              $scope.showError(msg);
+            });
         }
       } else {
         throw new Error('Could not find uiSelect element for ' + id);
@@ -224,23 +224,31 @@
           function addToConversions(path, options) {
             if (Object.keys(options).length > 0) {
               var keys = path.split('.');
-              if (!scope.conversions) {
-                  scope.conversions = {};
+
+              // Find the scope that owns the form (where the watcher is)
+              var conversionScope = scope;
+              while (conversionScope.$parent && !conversionScope.hasOwnProperty('topLevelFormName')) {
+                conversionScope = conversionScope.$parent;
               }
-              var target = scope.conversions;
+
+              if (!conversionScope.conversions) {
+                conversionScope.conversions = {};
+              }
+              var target = conversionScope.conversions;
               for (var i = 0; i < keys.length; i++) {
                 var thisKey = keys[i];
                 target[thisKey] = target[thisKey] || {};
                 target = target[thisKey];
               }
               angular.extend(target, options);
+              conversionScope.conversionsModified = true;
             }
           }
 
           const processedAttrs = PluginHelperService.extractFromAttr(attrs, 'fngUiSelect', scope);
           const id = processedAttrs.info.id;
           const uniqueId = scope.$index !== undefined ? processedAttrs.info.id + "_" + scope.$index : id;
-          const elemScope = angular.extend({selectId: uniqueId}, processedAttrs.directiveOptions);
+          const elemScope = angular.extend({ selectId: uniqueId }, processedAttrs.directiveOptions);
           const multi = processedAttrs.info.array;
           let elementHtml;
           let input = '';
@@ -259,7 +267,7 @@
                 if (angular.module('ngAnimate')) {
                   theme = 'select2';
                 }
-              } catch(e) {
+              } catch (e) {
                 ;    // module not present, so bootstrap theme will work
               }
             }
@@ -316,7 +324,7 @@
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
             var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
             if (isObjects) {
-              addToConversions(processedAttrs.info.name, {fngajax: FngUISelectHelperService.lookupFunc});
+              addToConversions(processedAttrs.info.name, { fngajax: FngUISelectHelperService.lookupFunc });
               FngUISelectHelperService.addClientLookup(arrayGetter, scope[array]);
             }
             var select = '';
@@ -351,7 +359,7 @@
               // specifies whether or not the buildingBlocks that it creates should include the id or not.
               const idIdx = buildingBlocks.common.indexOf('id="');
               if (idIdx > -1) {
-                const endIdIdx = buildingBlocks.common.indexOf('"', idIdx+4);
+                const endIdIdx = buildingBlocks.common.indexOf('"', idIdx + 4);
                 if (endIdIdx > -1) {
                   buildingBlocks.common = buildingBlocks.common.substring(0, idIdx) + buildingBlocks.common.substring(endIdIdx + 1);
                 }
@@ -367,7 +375,7 @@
                 // if we have a hard-coded ref (processedAttrs.info.ref), forms-angular can perform the lookup conversion for us.
                 // where processedAttrs.directiveOptions.refprop is being used instead, the ref is 'variable' - it comes from a property of scope.record, and
                 // in this case, we'll need to handle the conversions ourselves.
-                addToConversions(processedAttrs.info.name, {fngajax: FngUISelectHelperService.lookupFunc, noconvert: !!processedAttrs.directiveOptions.refprop});
+                addToConversions(processedAttrs.info.name, { fngajax: FngUISelectHelperService.lookupFunc, noconvert: !!processedAttrs.directiveOptions.refprop });
                 if (processedAttrs.directiveOptions.refprop) {
                   // the property that we'll be getting the ref from may not be populated yet, and might conceivably change at any time, so we
                   // need to $watch it.  buildingBlocks.modelString will be something like "record.<array>[$index].<field>".  replacing <field>
@@ -390,7 +398,7 @@
                   });
                 } else {
                   elemScope.ref = processedAttrs.info.ref;
-                }                
+                }
                 scope[`${uniqueId}_options`] = [];
                 if (multiControl) {
                   select += '{{$select.selected.text}}';
@@ -420,7 +428,7 @@
               select += '</ui-select>';
               return select;
             }
-          );          
+          );
           element.append($compile(input + elementHtml)(scope));
         }
       }
