@@ -99,7 +99,7 @@
           }
         } else if (typeof value !== "string") {
           cb(formSchema, value); // already converted
-        } else if (formSchema.fngUiSelect.deriveOptions) {
+        } else if (formSchema.fngUiSelect && formSchema.fngUiSelect.deriveOptions) {
           const obj = localLookups[formSchema.fngUiSelect.deriveOptions].find((test) => test.id === value);
           cb(formSchema, { id: value, text: obj ? obj.text : "" });
         } else {
