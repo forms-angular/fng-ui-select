@@ -402,9 +402,11 @@
                 scope[`${uniqueId}_options`] = [];
                 if (multiControl) {
                   select += '{{$select.selected.text}}';
-                } else if (processedAttrs.options.subschema) {
-                  select += '{{' + attrs.model + '.' + processedAttrs.info.name.replace(processedAttrs.options.subschemaroot, processedAttrs.options.subschemaroot + '[$index]') + '.text}}';
                 } else {
+                  // buildingBlocks.modelString already addresses the field correctly at every nesting
+                  // level, including inside a sub-schema array.  It used to be special cased here to
+                  // build an absolute "<root>[$index].<field>" path, which cannot reach a field in an
+                  // array nested within a sub-schema array - $index there belongs to the inner repeat.
                   select += '{{' + buildingBlocks.modelString + '.text}}';
                 }
                 select += '</ui-select-match>';
