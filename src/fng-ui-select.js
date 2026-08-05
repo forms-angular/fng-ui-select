@@ -57,6 +57,40 @@
       clearCache: function () {
         valueCache = {};
       },
+      // Builds a lookupFunc closure bound to a specific localLookups key. Used for the deriveOptions case
+      // instead of the generic lookupFunc below, because deriveOptions can resolve to a different scope
+      // array per row (e.g. one "Also willing to work for" picklist per contract row, each with its own
+      // leafNodes_N array) - the shared lookupFunc/localLookups keyed by the (row-shared) deriveOptions
+      // function name can't distinguish between rows, causing lookups to hit the wrong row's data.
+      makeDeriveOptionsLookupFunc: function (lkpName) {
+        return function (value, formSchema, cb) {
+          if (formSchema.array) {
+            const results = value.map((value) => {
+              // a value can already have been converted to { id, text } by an earlier run of this same
+              // conversion function (forms-angular can re-run conversions - see the comment on
+              // $watchCollection("conversions", ...) - so this isn't necessarily the first pass over this
+              // field). converting it again would wrap it a second time ({ id: { id, text }, text: "" }),
+              // silently corrupting the value, so pass already-converted entries through unchanged.
+              if (value && typeof value === "object") {
+                return value;
+              }
+              const obj = localLookups[lkpName].find((test) => test.id === value);
+              return { id: value, text: obj ? obj.text : "" };
+            });
+            cb(formSchema, results);
+            if (results.length > 0) {
+              setTimeout(function () {
+                $rootScope.$digest();
+              });
+            }
+          } else if (typeof value !== "string") {
+            cb(formSchema, value); // already converted
+          } else {
+            const obj = localLookups[lkpName].find((test) => test.id === value);
+            cb(formSchema, { id: value, text: obj ? obj.text : "" });
+          }
+        };
+      },
       lookupFunc: function (value, formSchema, cb) {
         if (formSchema.array) {
           if (formSchema.fngUiSelect.deriveOptions) {
@@ -324,8 +358,13 @@
           function optionsFromArray(multiControl, multi, array, arrayGetter) {
             var isObjects = scope[array] && (scope[array].isObjects || typeof scope[array][0] === "object");
             if (isObjects) {
-              addToConversions(processedAttrs.info.name, { fngajax: FngUISelectHelperService.lookupFunc });
-              FngUISelectHelperService.addClientLookup(arrayGetter, scope[array]);
+              // Key the lookup by the resolved scope array name (e.g. "leafNodes_0"), not by arrayGetter
+              // (the deriveOptions function name, which is shared/identical across every row when the same
+              // deriveOptions function is used for multiple rows, e.g. one per ng-repeat contract). Using
+              // arrayGetter as the key would make every row's conversion overwrite the same cache entry,
+              // leaving other rows' lookups resolving against the wrong array and rendering blank text.
+              addToConversions(processedAttrs.info.name, { fngajax: FngUISelectHelperService.makeDeriveOptionsLookupFunc(array) });
+              FngUISelectHelperService.addClientLookup(array, scope[array]);
             }
             var select = '';
             if (multiControl) {
