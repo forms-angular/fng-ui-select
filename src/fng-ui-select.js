@@ -112,7 +112,7 @@
               } else if (valueCache[id]) {
                 return $q.resolve({ data: { list: valueCache[id] } }); // already cached
               } else {
-                return SubmissionsService.getListAttributes(formSchema.ref, id); // need to look it up
+                return SubmissionsService.getAllPickListAttributes(formSchema.ref, id); // need to look it up
               }
             });
             // TODO: no error handling here
