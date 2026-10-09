@@ -226,13 +226,21 @@
             }
           })
             .catch(function (err) {
+              if (err && err.status <= 0) {
+                // Timed out, aborted or offline - the next keystroke will search again
+                return;
+              }
               var msg;
               if (err && err.data && err.data.message) {
                 msg = err.data.message;
               } else {
                 msg = 'Error ' + err.status + ': ' + err.statusText + ' - ' + err.data;
               }
-              $scope.showError(msg);
+              if (typeof $scope.showError === 'function') {
+                $scope.showError(msg);
+              } else {
+                console.error(msg);
+              }
             });
         }
       } else {
