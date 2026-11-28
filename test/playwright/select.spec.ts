@@ -27,6 +27,7 @@ test('Creates a new record with multiple shelves', async ({ page }) => {
   await expect(page.getByLabel('Favourite Shelf')).toContainText('Bottom');
   await page.getByRole('button', { name: ' Save' }).click();
   await expect(page.getByRole('button', { name: ' Save' })).toBeDisabled();
+  await expect(page).toHaveURL(/k_referencing_self_collection\/[0-9a-f]{24}\/edit/);
   await expect(page.locator('#f_cleanedShelves_0')).toContainText('Middle');
   // await expect(page.locator('#f_cleanedShelves_0')).toHaveClass(/ng-valid-required/);    // This currently fails, but has done I think for ages...
   await expect(page.getByLabel('Favourite Shelf')).toContainText('Bottom');
@@ -56,6 +57,7 @@ test('Creates a new record with a single shelf', async ({ page }) => {
   await page.getByLabel('Favourite Shelf').selectOption('Only');
   await page.getByRole('button', { name: ' Save' }).click();
   await expect(page.getByRole('button', { name: ' Save' })).toBeDisabled();
+  await expect(page).toHaveURL(/k_referencing_self_collection\/[0-9a-f]{24}\/edit/);
   await expect(page.locator('#f_cleanedShelves_0')).toContainText('Only');
 
   await page.goto('http://localhost:9000/#/l_referencing_list_in_other_document/new');

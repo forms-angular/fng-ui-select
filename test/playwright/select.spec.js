@@ -37,6 +37,7 @@ const unique = new Date().valueOf();
     yield (0, test_1.expect)(page.getByLabel('Favourite Shelf')).toContainText('Bottom');
     yield page.getByRole('button', { name: ' Save' }).click();
     yield (0, test_1.expect)(page.getByRole('button', { name: ' Save' })).toBeDisabled();
+    yield (0, test_1.expect)(page).toHaveURL(/k_referencing_self_collection\/[0-9a-f]{24}\/edit/);
     yield (0, test_1.expect)(page.locator('#f_cleanedShelves_0')).toContainText('Middle');
     // await expect(page.locator('#f_cleanedShelves_0')).toHaveClass(/ng-valid-required/);    // This currently fails, but has done I think for ages...
     yield (0, test_1.expect)(page.getByLabel('Favourite Shelf')).toContainText('Bottom');
@@ -64,6 +65,7 @@ const unique = new Date().valueOf();
     yield page.getByLabel('Favourite Shelf').selectOption('Only');
     yield page.getByRole('button', { name: ' Save' }).click();
     yield (0, test_1.expect)(page.getByRole('button', { name: ' Save' })).toBeDisabled();
+    yield (0, test_1.expect)(page).toHaveURL(/k_referencing_self_collection\/[0-9a-f]{24}\/edit/);
     yield (0, test_1.expect)(page.locator('#f_cleanedShelves_0')).toContainText('Only');
     yield page.goto('http://localhost:9000/#/l_referencing_list_in_other_document/new');
     yield page.getByLabel('Description').fill('Single');
